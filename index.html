@@ -1,0 +1,3624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cuentas Luz San Michell - Control Solar Locales</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --primary: #0f172a;
+      --accent-solar: #f59e0b;
+      --accent-solar-dark: #d97706;
+      --accent-blue: #0284c7;
+      --accent-green: #16a34a;
+      --accent-red: #dc2626;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* ================= PANTALLA DE LOGIN (4 ADMINISTRADORES) ================= */
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(145deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .login-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 430px;
+      border-radius: 24px;
+      padding: 28px 24px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+      text-align: center;
+      border: 2px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .solar-badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fef3c7;
+      color: #b45309;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .login-card h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .login-card p.sub {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .admin-select-btn {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .admin-select-btn:hover {
+      border-color: #cbd5e1;
+      background: #f1f5f9;
+    }
+
+    .admin-select-btn.selected {
+      background: #fffbeb;
+      border-color: var(--accent-solar);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2);
+    }
+
+    .admin-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+    }
+
+    .admin-select-btn .admin-name {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: #0f172a;
+    }
+
+    .admin-select-btn .admin-role {
+      font-size: 10.5px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .pin-input-box {
+      margin-bottom: 14px;
+    }
+
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 10px 0 16px;
+    }
+
+    .pin-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #94a3b8;
+      background: transparent;
+      transition: all 0.15s;
+    }
+
+    .pin-dot.filled {
+      background: var(--accent-solar);
+      border-color: var(--accent-solar-dark);
+      transform: scale(1.1);
+    }
+
+    .pin-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .pin-key {
+      height: 52px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      cursor: pointer;
+      transition: all 0.12s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .pin-key:active {
+      background: #fde68a;
+      border-color: var(--accent-solar);
+      transform: scale(0.96);
+    }
+
+    .login-hint {
+      margin-top: 16px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 11.5px;
+      color: #475569;
+    }
+
+    /* ================= BARRA SUPERIOR (HEADER) ================= */
+    .app-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #fff;
+      padding: 14px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      border-bottom: 2px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .solar-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+    }
+
+    .brand-block h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    .brand-block span {
+      font-size: 11px;
+      color: #fcd34d;
+      font-weight: 600;
+      display: block;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .active-admin-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-solar {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0f172a;
+    }
+
+    .btn-solar:hover {
+      filter: brightness(1.05);
+    }
+
+    .btn-outline-light {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-outline-light:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .btn-primary {
+      background: #0284c7;
+      color: #fff;
+    }
+
+    .btn-success {
+      background: #16a34a;
+      color: #fff;
+    }
+
+    .btn-WhatsApp {
+      background: #25d366;
+      color: #075e54;
+      font-weight: 800;
+    }
+
+    /* ================= CONTENEDOR PRINCIPAL ================= */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* ================= BARRA DE MESES & TARIFA KWH ================= */
+    .month-tariff-bar {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .months-scroll {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      max-width: 100%;
+    }
+
+    .month-tab {
+      padding: 8px 15px;
+      border-radius: 10px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .month-tab.active {
+      background: #0f172a;
+      color: #fcd34d;
+      border-color: #0f172a;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+    }
+
+    .tariff-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fffbeb;
+      border: 1.5px solid #fde68a;
+      padding: 6px 12px;
+      border-radius: 10px;
+    }
+
+    .tariff-box label {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #92400e;
+      text-transform: uppercase;
+    }
+
+    .tariff-input {
+      width: 78px;
+      padding: 5px 8px;
+      border-radius: 7px;
+      border: 1px solid #f59e0b;
+      background: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      text-align: right;
+    }
+
+    /* ================= TARJETAS KPI RESUMEN DEL MES ================= */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .kpi-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-card .kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.4px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-card .kpi-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .kpi-card .kpi-sub {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .kpi-card.solar-highlight {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #fff;
+      border-color: #334155;
+    }
+
+    .kpi-card.solar-highlight .kpi-label {
+      color: #fcd34d;
+    }
+
+    .kpi-card.solar-highlight .kpi-val {
+      color: #fff;
+    }
+
+    .kpi-card.solar-highlight .kpi-sub {
+      color: #cbd5e1;
+    }
+
+    /* ================= BARRA DE HERRAMIENTAS Y FILTROS ================= */
+    .controls-toolbar {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .view-switcher {
+      display: flex;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 10px;
+      gap: 4px;
+    }
+
+    .view-btn {
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: #475569;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .view-btn.active {
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .search-filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      flex-grow: 1;
+      justify-content: flex-end;
+    }
+
+    .search-input {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 13px;
+      font-family: inherit;
+      min-width: 200px;
+      flex-grow: 1;
+      max-width: 320px;
+    }
+
+    .filter-pill-select {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    /* ================= VISTA 1: TARJETAS MÓVILES (TERRENO / CELULAR) ================= */
+    .mobile-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 680px) {
+      .mobile-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1040px) {
+      .mobile-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .meter-card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      padding: 14px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .meter-card.status-pending-reading {
+      border-left: 5px solid #f59e0b;
+    }
+
+    .meter-card.status-ready {
+      border-left: 5px solid #0284c7;
+    }
+
+    .meter-card.status-paid {
+      border-left: 5px solid #16a34a;
+      background: #fcfffd;
+    }
+
+    .meter-card.status-exempt {
+      border-left: 5px solid #94a3b8;
+      opacity: 0.85;
+    }
+
+    .meter-card.mall-chino-card {
+      border: 2px solid #f59e0b;
+      background: linear-gradient(180deg, #fffdf5 0%, #ffffff 100%);
+    }
+
+    .meter-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .local-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+      color: #fcd34d;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      min-width: 68px;
+      text-align: center;
+    }
+
+    .local-rubro-input {
+      font-weight: 800;
+      font-size: 15px;
+      color: #0f172a;
+      border: 1px solid transparent;
+      background: transparent;
+      padding: 3px 6px;
+      border-radius: 6px;
+      width: 100%;
+      text-transform: uppercase;
+      font-family: inherit;
+    }
+
+    .local-rubro-input:focus {
+      border-color: #0284c7;
+      background: #f0f9ff;
+      outline: none;
+    }
+
+    .readings-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .reading-field label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .reading-input {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      background: #fff;
+    }
+
+    .reading-input.actual-input {
+      border-color: #0284c7;
+      background: #f0f9ff;
+    }
+
+    .reading-input:focus {
+      outline: none;
+      border-color: #f59e0b;
+      background: #fffbeb;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+    }
+
+    .calc-result-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+    }
+
+    .calc-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .calc-item span.lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: #92400e;
+      text-transform: uppercase;
+    }
+
+    .calc-item span.val-kwh {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .calc-item span.val-clp {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #b45309;
+    }
+
+    .manual-reading-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11.5px;
+      background: #f1f5f9;
+      padding: 6px 10px;
+      border-radius: 8px;
+      color: #475569;
+    }
+
+    .manual-reading-bar input {
+      width: 90px;
+      padding: 4px 7px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-weight: 700;
+      font-size: 12.5px;
+      text-align: right;
+      background: #fff;
+    }
+
+    .card-footer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding-top: 6px;
+      border-top: 1px dashed #e2e8f0;
+      flex-wrap: wrap;
+    }
+
+    .chip-btn {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #475569;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chip-btn.paid {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #86efac;
+    }
+
+    .chip-btn.unpaid {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: #fecaca;
+    }
+
+    .chip-btn.exempt {
+      background: #e2e8f0;
+      color: #475569;
+      border-color: #94a3b8;
+    }
+
+    .audit-stamp {
+      font-size: 10px;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    /* ================= VISTA 2: TABLA COMPLETA (ESTILO EXCEL EN PÁGINA) ================= */
+    .table-wrapper {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      overflow-x: auto;
+    }
+
+    .solar-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }
+
+    .solar-table th {
+      background: #0f172a;
+      color: #fcd34d;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 11px 10px;
+      text-align: left;
+      border-bottom: 2px solid #f59e0b;
+    }
+
+    .solar-table th.num {
+      text-align: right;
+    }
+
+    .solar-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .solar-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .solar-table tr:hover {
+      background: #f0f9ff;
+    }
+
+    .solar-table tr.row-total-locales {
+      background: #fef3c7 !important;
+      font-weight: 800;
+      border-top: 2px solid #f59e0b;
+      border-bottom: 2px solid #f59e0b;
+    }
+
+    .solar-table tr.row-mall-chino {
+      background: #fff7ed !important;
+      font-weight: 700;
+    }
+
+    .solar-table tr.row-total-final {
+      background: #0f172a !important;
+      color: #ffffff !important;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .solar-table tr.row-total-final td {
+      color: #ffffff !important;
+      padding: 12px 10px;
+    }
+
+    .tbl-input {
+      width: 92px;
+      padding: 5px 7px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: right;
+      background: #fff;
+    }
+
+    .tbl-input:focus {
+      border-color: #f59e0b;
+      background: #fffbeb;
+      outline: none;
+    }
+
+    .tbl-rubro-input {
+      width: 100%;
+      min-width: 130px;
+      padding: 5px 7px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 12.5px;
+      text-transform: uppercase;
+      background: transparent;
+    }
+
+    .tbl-rubro-input:focus {
+      border-color: #0284c7;
+      background: #fff;
+      outline: none;
+    }
+
+    /* ================= VISTA 3: HISTORIAL Y COMPARATIVA ================= */
+    .history-panel {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .bar-chart-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .bar-label {
+      width: 130px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .bar-track {
+      flex-grow: 1;
+      height: 24px;
+      background: #f1f5f9;
+      border-radius: 99px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #0284c7);
+      border-radius: 99px;
+      transition: width 0.3s ease;
+    }
+
+    .bar-value {
+      width: 180px;
+      text-align: right;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    /* ================= MODALES ================= */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-box {
+      background: #fff;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-box h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 19px;
+      color: #0f172a;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .admin-edit-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 90px;
+      gap: 8px;
+      margin-bottom: 10px;
+      align-items: center;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .admin-edit-row input {
+      padding: 7px 9px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      width: 100%;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      left: 20px;
+      max-width: 400px;
+      margin: 0 auto;
+      background: #0f172a;
+      color: #fcd34d;
+      border-left: 4px solid #f59e0b;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      z-index: 6000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.25s ease;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media print {
+      .login-screen,
+      .app-header,
+      .controls-toolbar,
+      .modal-overlay,
+      .toast,
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #fff !important;
+        padding: 0 !important;
+      }
+      .main-container {
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+      .table-wrapper {
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .solar-table th,
+      .solar-table tr.row-total-locales,
+      .solar-table tr.row-total-final {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    /* ================= VISTA 4: TABLAS E IMÁGENES DE CONSUMO ================= */
+    .visuals-subnav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      background: #fff;
+      padding: 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .vis-tab-btn {
+      flex: 1;
+      min-width: 170px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 800;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .vis-tab-btn.active {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #fcd34d;
+      border-color: #f59e0b;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+    }
+
+    .visual-card-box {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+    }
+
+    .canvas-preview-wrap {
+      background: #0f172a;
+      border-radius: 14px;
+      padding: 14px;
+      overflow-x: auto;
+      text-align: center;
+      border: 2px solid #334155;
+      margin-top: 12px;
+    }
+
+    .canvas-preview-wrap canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      background: #ffffff;
+    }
+
+    .photo-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .photo-item-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .photo-thumb-box {
+      width: 100%;
+      height: 150px;
+      border-radius: 8px;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      border: 1px dashed #94a3b8;
+    }
+
+    .photo-thumb-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    .code-editor-textarea {
+      width: 100%;
+      min-height: 280px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12px;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      resize: vertical;
+    }
+  </style>
+  <style id="customOwnerStyles"></style>
+</head>
+<body>
+
+  <!-- ================= PANTALLA DE ACCESO EXCLUSIVO (4 ADMINISTRADORES) ================= -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="solar-badge-top">☀️ Energía Solar • Panadería y Locales</div>
+      <h1 id="loginMainTitle">Cuentas Luz San Michell</h1>
+      <p class="sub">Acceso exclusivo para los 4 Administradores autorizados</p>
+
+      <div class="admin-grid" id="loginAdminGrid">
+        <!-- Botones de los 4 administradores generados dinámicamente -->
+      </div>
+
+      <div class="pin-input-box">
+        <div style="font-size: 12px; font-weight: 700; color: #475569;" id="pinPromptLabel">
+          Ingresa tu PIN de 4 dígitos
+        </div>
+        <div class="pin-dots" id="pinDots">
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+        </div>
+
+        <div class="pin-pad">
+          <button class="pin-key" onclick="pressPin('1')">1</button>
+          <button class="pin-key" onclick="pressPin('2')">2</button>
+          <button class="pin-key" onclick="pressPin('3')">3</button>
+          <button class="pin-key" onclick="pressPin('4')">4</button>
+          <button class="pin-key" onclick="pressPin('5')">5</button>
+          <button class="pin-key" onclick="pressPin('6')">6</button>
+          <button class="pin-key" onclick="pressPin('7')">7</button>
+          <button class="pin-key" onclick="pressPin('8')">8</button>
+          <button class="pin-key" onclick="pressPin('9')">9</button>
+          <button class="pin-key" style="font-size: 13px; color: #64748b;" onclick="clearPin()">Borrar</button>
+          <button class="pin-key" style="font-size: 20px;" onclick="pressPin('0')">0</button>
+          <button class="pin-key" style="background: #fef3c7; color: #b45309;" onclick="backspacePin()">⌫</button>
+        </div>
+      </div>
+
+      <div class="login-hint">
+        🔒 Selecciona tu perfil de administrador e ingresa tu clave PIN personal de 4 dígitos.
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ENCABEZADO PRINCIPAL ================= -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-block">
+        <div class="solar-icon-box">☀️</div>
+        <div>
+          <h2 id="headerMainTitle">Cuentas Luz San Michell</h2>
+          <span id="headerSubTitle">GENERACIÓN SOLAR • REGISTRO Y COBRO MENSUAL</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="active-admin-pill" id="activeAdminPill" onclick="handleAdminPillClick()" title="Usuario activo">
+          <span>👤</span>
+          <span id="currentAdminBadge">Débora</span>
+          <span id="adminGearIcon" style="opacity: 0.7; font-size: 10px; display: none;">⚙️</span>
+        </div>
+
+        <button class="btn btn-outline-light" id="btnManageAdmins" style="display: none;" onclick="openAdminsModal()">👥 Administrar Claves</button>
+        <button class="btn btn-outline-light" id="btnGoogleCode" style="display: none; border-color: #fcd34d; color: #fcd34d;" onclick="openGoogleCodeModal()">🔐 Código (Google)</button>
+        <button class="btn btn-outline-light" onclick="openSyncModal()">📲 Sincronizar / Respaldo</button>
+        <button class="btn btn-solar" onclick="openNewMonthModal()">➕ Nuevo Mes</button>
+        <button class="btn btn-outline-light" onclick="lockSession()" title="Cerrar sesión">🔒 Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= CONTENIDO PRINCIPAL ================= -->
+  <main class="main-container">
+
+    <!-- SELECTOR DE MES Y PRECIO KWH -->
+    <div class="month-tariff-bar">
+      <div class="months-scroll" id="monthTabsContainer">
+        <!-- Pestañas Julio, Agosto, Septiembre, Octubre... -->
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <div class="tariff-box">
+          <label for="tariffInput">⚡ Precio kWh ($):</label>
+          <input type="number" id="tariffInput" class="tariff-input" value="239" onchange="updateMonthTariff(this.value)">
+        </div>
+        <button class="btn btn-primary no-print" onclick="exportCurrentMonthCSV()" title="Descargar tabla en formato Excel CSV">📥 Descargar Excel (CSV)</button>
+        <button class="btn btn-success no-print" onclick="printTableReport()" title="Imprimir o guardar PDF del mes">🖨️ Imprimir / PDF</button>
+      </div>
+    </div>
+
+    <!-- TARJETAS DE RESUMEN EJECUTIVO -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">🏢 Total Locales (1 al 30)</span>
+        <div class="kpi-val" id="kpiLocalesMoney">$0</div>
+        <div class="kpi-sub" id="kpiLocalesKwh">0 kWh consumidos</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">🏮 Local 31 • Mall Chino</span>
+        <div class="kpi-val" id="kpiMallMoney">$0</div>
+        <div class="kpi-sub" id="kpiMallKwh">0 kWh consumidos</div>
+      </div>
+
+      <div class="kpi-card solar-highlight">
+        <span class="kpi-label">☀️ TOTAL FINAL DEL MES</span>
+        <div class="kpi-val" id="kpiFinalMoney">$0</div>
+        <div class="kpi-sub" id="kpiFinalKwh">0 kWh energía solar total</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">✅ Estado de Lecturas y Cobro</span>
+        <div class="kpi-val" id="kpiProgressReadings">0 / 31</div>
+        <div class="kpi-sub" id="kpiPaidSummary">Pagado: $0 • Pendiente: $0</div>
+      </div>
+    </div>
+
+    <!-- BARRA DE VISTAS Y FILTROS -->
+    <div class="controls-toolbar no-print">
+      <div class="view-switcher" style="flex-wrap: wrap;">
+        <button class="view-btn active" id="btnViewCards" onclick="setViewMode('cards')">📱 Modo Celular (Tarjetas)</button>
+        <button class="view-btn" id="btnViewTable" onclick="setViewMode('table')">📊 Tabla Completa</button>
+        <button class="view-btn" id="btnViewVisuals" onclick="setViewMode('visuals')">🖼️ Consumos (Tablas e Imágenes)</button>
+        <button class="view-btn" id="btnViewHistory" onclick="setViewMode('history')">📈 Resumen & Historial</button>
+      </div>
+
+      <div class="search-filter-group">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar local (ej. 1, Verdulería, Carnicería...)" oninput="renderCurrentView()">
+        
+        <select id="statusFilter" class="filter-pill-select" onchange="renderCurrentView()">
+          <option value="all">📋 Todos los Locales (31)</option>
+          <option value="pending-reading">⏳ Falta Lectura Actual</option>
+          <option value="with-reading">✅ Con Lectura Lista</option>
+          <option value="unpaid">💰 Pendientes de Pago</option>
+          <option value="paid">🟢 Pagados</option>
+          <option value="exempt">⚪ Sin Cobro / Vacíos</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- VISTA 1: MODO CELULAR (TARJETAS INTERACTIVAS PARA TOMA DE LECTURA Y COBRO) -->
+    <div id="viewCardsContainer" class="mobile-cards-grid">
+      <!-- Generado por JS -->
+    </div>
+
+    <!-- VISTA 2: TABLA COMPLETA (IGUAL AL EXCEL PERO INTERACTIVA) -->
+    <div id="viewTableContainer" class="table-wrapper" style="display: none;">
+      <div style="padding: 14px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <strong style="font-size: 15px; color: #0f172a;" id="tableMonthTitle">SEPTIEMBRE 2026</strong>
+          <span style="font-size: 12px; color: #64748b; margin-left: 8px;" id="tableTariffSubtitle">PRECIO kWh: $239</span>
+        </div>
+        <div style="font-size: 11.5px; color: #475569;" class="no-print">
+          💡 Edita cualquier lectura o rubro directamente en la fila. Se guarda automáticamente.
+        </div>
+      </div>
+      <table class="solar-table">
+        <thead>
+          <tr>
+            <th style="width: 60px;">Local</th>
+            <th>Rubro / Locatario</th>
+            <th class="num">Lectura Anterior</th>
+            <th class="num">Lectura Actual</th>
+            <th class="num">Consumo (kWh)</th>
+            <th class="num">Valor ($)</th>
+            <th class="num">Lectura Manual</th>
+            <th style="text-align: center;">Cobro / Estado</th>
+            <th class="no-print" style="text-align: center;">Recibo</th>
+          </tr>
+        </thead>
+        <tbody id="solarTableBody">
+          <!-- Generado por JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- VISTA 4: VISUALIZACIÓN DE CONSUMOS COMO TABLAS O IMÁGENES -->
+    <div id="viewVisualsContainer" style="display: none;">
+      <div class="visuals-subnav">
+        <button class="vis-tab-btn active" id="visBtnTableImg" onclick="setVisualSubTab('table-img')">🖼️ Tabla del Mes en Imagen</button>
+        <button class="vis-tab-btn" id="visBtnRanking" onclick="setVisualSubTab('ranking')">📊 Tabla Ranking y Gráfico en Imagen</button>
+        <button class="vis-tab-btn" id="visBtnReceiptImg" onclick="setVisualSubTab('receipt-img')">🧾 Boleta en Imagen por Local</button>
+        <button class="vis-tab-btn" id="visBtnPhotos" onclick="setVisualSubTab('photos')">📷 Fotos de Medidores por Local</button>
+      </div>
+
+      <!-- SUB-APARTADO 1: IMAGEN DE LA TABLA GENERAL DEL MES -->
+      <div id="visSectionTableImg" class="visual-card-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+          <div>
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #0f172a;">🖼️ Tabla de Consumos del Mes como Imagen (PNG)</h3>
+            <p style="font-size: 12.5px; color: #64748b;">Genera una imagen nítida de la tabla para compartirla como foto por WhatsApp o guardarla en la galería del celular.</p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <select id="imgTableFilterSelect" class="filter-pill-select" onchange="renderTableImageCanvas()">
+              <option value="all">📋 Todos los Locales (1 al 31)</option>
+              <option value="with-consumption">⚡ Solo Locales con Consumo (> 0 kWh)</option>
+              <option value="unpaid">⏳ Solo Pendientes de Pago</option>
+              <option value="paid">✅ Solo Locales Pagados</option>
+            </select>
+            <button class="btn btn-primary" onclick="downloadCanvasAsPNG('tableImageCanvas', 'Tabla_Consumos_San_Michell')">📥 Descargar Imagen PNG</button>
+            <button class="btn btn-WhatsApp" onclick="shareCanvasImage('tableImageCanvas', 'Tabla_Consumos_San_Michell')">📲 Compartir Imagen</button>
+          </div>
+        </div>
+        <div class="canvas-preview-wrap">
+          <canvas id="tableImageCanvas" width="1080" height="1450"></canvas>
+        </div>
+      </div>
+
+      <!-- SUB-APARTADO 2: TABLA RANKING COMPARATIVA + GRÁFICO EN IMAGEN -->
+      <div id="visSectionRanking" class="visual-card-box" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+          <div>
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #0f172a;">📊 Tabla Ranking de Consumos y Gráfico en Imagen</h3>
+            <p style="font-size: 12.5px; color: #64748b;">Visualiza los locales ordenados de mayor a menor consumo energético (kWh y $) en tabla y en gráfico descargable como imagen.</p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="downloadCanvasAsPNG('chartImageCanvas', 'Grafico_Consumos_San_Michell')">📥 Descargar Gráfico en Imagen</button>
+            <button class="btn btn-WhatsApp" onclick="shareCanvasImage('chartImageCanvas', 'Grafico_Consumos_San_Michell')">📲 Compartir Gráfico</button>
+          </div>
+        </div>
+
+        <div class="canvas-preview-wrap" style="margin-bottom: 18px;">
+          <canvas id="chartImageCanvas" width="1080" height="920"></canvas>
+        </div>
+
+        <h4 style="font-family: 'Outfit', sans-serif; font-size: 16px; margin-bottom: 10px; color: #0f172a;">📋 Tabla Resumen de Consumos Ordenada (Mayor a Menor)</h4>
+        <div class="table-wrapper">
+          <table class="solar-table" style="min-width: 640px;">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Posición</th>
+                <th style="width: 80px;">Local</th>
+                <th>Rubro / Locatario</th>
+                <th class="num">Lect. Anterior</th>
+                <th class="num">Lect. Actual</th>
+                <th class="num">Consumo (kWh)</th>
+                <th style="width: 180px;">Participación (%)</th>
+                <th class="num">Total ($)</th>
+                <th style="text-align: center;">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="rankingTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUB-APARTADO 3: BOLETA / TARJETA EN IMAGEN POR LOCAL -->
+      <div id="visSectionReceiptImg" class="visual-card-box" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+          <div>
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #0f172a;">🧾 Boleta Visual de Consumo en Imagen por Local</h3>
+            <p style="font-size: 12.5px; color: #64748b;">Selecciona cualquier local para generar su comprobante en imagen PNG y enviarlo directo al locatario por WhatsApp.</p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <select id="receiptLocalSelect" class="filter-pill-select" onchange="renderReceiptImageCanvas()"></select>
+            <button class="btn btn-primary" onclick="downloadCanvasAsPNG('receiptImageCanvas', 'Boleta_Luz_Local_' + (document.getElementById('receiptLocalSelect')?.value || '1'))">📥 Descargar Boleta PNG</button>
+            <button class="btn btn-WhatsApp" onclick="shareCanvasImage('receiptImageCanvas', 'Boleta_Luz_Local_' + (document.getElementById('receiptLocalSelect')?.value || '1'))">📲 Enviar Imagen por WhatsApp</button>
+          </div>
+        </div>
+        <div class="canvas-preview-wrap">
+          <canvas id="receiptImageCanvas" width="720" height="840"></canvas>
+        </div>
+      </div>
+
+      <!-- SUB-APARTADO 4: FOTOS DE MEDIDORES POR LOCAL -->
+      <div id="visSectionPhotos" class="visual-card-box" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #0f172a;">📷 Galería de Fotos de Medidores y Lecturas</h3>
+            <p style="font-size: 12.5px; color: #64748b;">Sube o toma una foto del medidor de cada local desde tu celular para dejar respaldo en imagen del consumo del mes.</p>
+          </div>
+        </div>
+        <div id="meterPhotosGrid" class="photo-gallery-grid"></div>
+      </div>
+    </div>
+
+    <!-- VISTA 3: RESUMEN SOLAR & HISTORIAL POR LOCAL -->
+    <div id="viewHistoryContainer" style="display: none;">
+      <div class="history-panel">
+        <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; margin-bottom: 14px;">☀️ Evolución Mensual de Consumo Solar y Facturación</h3>
+        <div id="monthlyComparisonChart"></div>
+      </div>
+
+      <div class="history-panel">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px;">🔎 Historial Detallado por Local</h3>
+          <select id="historyLocalSelect" class="filter-pill-select" onchange="renderHistoryView()"></select>
+        </div>
+        <div class="table-wrapper">
+          <table class="solar-table" style="min-width: 600px;">
+            <thead>
+              <tr>
+                <th>Mes / Año</th>
+                <th>Rubro</th>
+                <th class="num">Lectura Anterior</th>
+                <th class="num">Lectura Actual</th>
+                <th class="num">Consumo (kWh)</th>
+                <th class="num">Valor Cobrado ($)</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="localHistoryTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= MODAL 1: GESTIÓN DE LOS 4 ADMINISTRADORES ================= -->
+  <div class="modal-overlay" id="adminsModal">
+    <div class="modal-box">
+      <h3>👥 Configurar los 4 Administradores</h3>
+      <p style="font-size: 12.5px; color: #64748b; margin-bottom: 14px;">
+        Aquí puedes personalizar los nombres, cargos y el PIN de acceso (4 dígitos) de las 4 personas autorizadas:
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 90px; gap: 8px; padding: 0 10px; margin-bottom: 6px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase;">
+        <span>Nombre</span>
+        <span>Cargo / Rol</span>
+        <span>PIN (4 díg.)</span>
+      </div>
+
+      <div id="adminsEditContainer"></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+        <button class="btn" style="background: #f1f5f9; color: #475569;" onclick="closeAdminsModal()">Cancelar</button>
+        <button class="btn btn-solar" onclick="saveAdminsConfig()">💾 Guardar 4 Administradores</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 2: CREAR NUEVO MES ================= -->
+  <div class="modal-overlay" id="newMonthModal">
+    <div class="modal-box" style="max-width: 420px;">
+      <h3>➕ Abrir Nuevo Mes de Lectura</h3>
+      <p style="font-size: 12.5px; color: #64748b; margin-bottom: 14px;">
+        La aplicación copiará automáticamente la <strong>Lectura Actual</strong> del último mes como la <strong>Lectura Anterior</strong> del nuevo mes para los 31 locales.
+      </p>
+
+      <div style="margin-bottom: 12px;">
+        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:4px;">Mes:</label>
+        <select id="newMonthName" class="filter-pill-select" style="width:100%; padding:10px;">
+          <option value="ENERO">ENERO</option>
+          <option value="FEBRERO">FEBRERO</option>
+          <option value="MARZO">MARZO</option>
+          <option value="ABRIL">ABRIL</option>
+          <option value="MAYO">MAYO</option>
+          <option value="JUNIO">JUNIO</option>
+          <option value="JULIO">JULIO</option>
+          <option value="AGOSTO">AGOSTO</option>
+          <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+          <option value="OCTUBRE">OCTUBRE</option>
+          <option value="NOVIEMBRE" selected>NOVIEMBRE</option>
+          <option value="DICIEMBRE">DICIEMBRE</option>
+        </select>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; margin-bottom:4px;">Año:</label>
+          <input type="number" id="newMonthYear" class="reading-input" style="font-size:15px;" value="2026">
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; margin-bottom:4px;">Precio kWh ($):</label>
+          <input type="number" id="newMonthTariff" class="reading-input" style="font-size:15px;" value="239">
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn" style="background: #f1f5f9; color: #475569;" onclick="closeNewMonthModal()">Cancelar</button>
+        <button class="btn btn-solar" onclick="confirmCreateNewMonth()">Crear Mes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 3: SINCRONIZAR ENTRE CELULARES / RESPALDO ================= -->
+  <div class="modal-overlay" id="syncModal">
+    <div class="modal-box">
+      <h3>📲 Sincronizar los 4 Celulares y Respaldos</h3>
+      <p style="font-size: 12.5px; color: #64748b; margin-bottom: 14px;">
+        Todos los datos se guardan automáticamente en tiempo real en la nube y en este dispositivo. Además puedes usar estas opciones rápidas:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 12px;">
+          <div style="font-weight: 800; font-size: 13px; color: #166534; margin-bottom: 6px;">1. Enviar Resumen del Mes por WhatsApp</div>
+          <p style="font-size: 11.5px; color: #15803d; margin-bottom: 8px;">Envía el reporte completo del mes actual al grupo de WhatsApp de los 4 administradores.</p>
+          <button class="btn btn-WhatsApp" style="width: 100%;" onclick="shareMonthSummaryWhatsApp()">📲 Enviar Resumen del Mes al WhatsApp</button>
+        </div>
+
+        <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 12px; border-radius: 12px;">
+          <div style="font-weight: 800; font-size: 13px; color: #075985; margin-bottom: 6px;">2. Exportar / Importar Base de Datos Completa</div>
+          <p style="font-size: 11.5px; color: #0369a1; margin-bottom: 8px;">Descarga un archivo con todos los meses para enviarlo por WhatsApp/OneDrive a otro administrador, o carga el archivo recibido.</p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-primary" style="flex: 1;" onclick="downloadFullBackupJSON()">⬇️ Descargar Respaldo</button>
+            <label class="btn" style="flex: 1; background: #fff; border: 1px solid #0284c7; color: #0284c7; cursor: pointer;">
+              ⬆️ Cargar Respaldo
+              <input type="file" accept=".json" style="display: none;" onchange="uploadFullBackupJSON(event)">
+            </label>
+          </div>
+        </div>
+
+        <div style="background: #fffbeb; border: 1px solid #fde68a; padding: 12px; border-radius: 12px;">
+          <div style="font-weight: 800; font-size: 13px; color: #92400e; margin-bottom: 6px;">3. Restaurar Datos Originales de la Planilla</div>
+          <p style="font-size: 11.5px; color: #b45309; margin-bottom: 8px;">Vuelve a cargar los valores exactos de Julio, Agosto, Septiembre y Octubre 2026.</p>
+          <button class="btn" style="background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; width: 100%;" onclick="resetToFactoryData()">🔄 Restaurar Datos Originales</button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn" style="background: #0f172a; color: #fff;" onclick="closeSyncModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 4: EDICIÓN DE CÓDIGO EXCLUSIVA CON CUENTA DE GOOGLE ================= -->
+  <div class="modal-overlay" id="googleCodeModal">
+    <div class="modal-box" style="max-width: 680px;">
+      <h3>🔐 Editor de Código y Configuración (Exclusivo Cuenta Google)</h3>
+      <p style="font-size: 12.5px; color: #64748b; margin-bottom: 14px;">
+        El código fuente y diseño de <strong>Cuentas Luz San Michell</strong> están protegidos. Solo la cuenta de Google propietaria puede desbloquear y editar el código.
+      </p>
+
+      <!-- Estado de verificación de Cuenta Google -->
+      <div id="googleAuthLockBox" style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 16px; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <span style="font-size: 24px;">🛡️</span>
+          <div>
+            <div style="font-weight: 800; font-size: 14px; color: #0f172a;">Verificación de Cuenta de Google Propietaria</div>
+            <div style="font-size: 12px; color: #64748b;" id="googleOwnerStatusText">Ingresa o confirma tu correo de Google autorizado para habilitar la edición de código.</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <input type="email" id="googleOwnerEmailInput" class="search-input" style="max-width: none; flex: 1;" placeholder="tu-correo@gmail.com">
+          <button class="btn btn-primary" onclick="verifyGoogleOwnerAccess()">🔓 Verificar con mi Cuenta Google</button>
+        </div>
+        <div style="font-size: 11px; color: #475569; margin-top: 8px;">
+          💡 Una vez vinculado tu correo de Google por primera vez, quedará registrado como único propietario autorizado junto con la clave maestra de Débora.
+        </div>
+      </div>
+
+      <!-- Panel de edición desbloqueado solo para la cuenta Google propietaria -->
+      <div id="googleCodeEditorPanel" style="display: none;">
+        <div style="background: #ecfdf5; border: 1px solid #86efac; color: #166534; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <span id="verifiedGoogleBadge">✅ Cuenta de Google verificada</span>
+          <button class="chip-btn" onclick="lockGoogleCodeEditor()">🔒 Bloquear Editor</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; margin-bottom:4px;">Título Principal de la Página:</label>
+            <input type="text" id="cfgAppTitle" class="reading-input" style="font-size:13.5px; padding:7px 10px;" value="Cuentas Luz San Michell">
+          </div>
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; margin-bottom:4px;">Subtítulo del Encabezado:</label>
+            <input type="text" id="cfgAppSubtitle" class="reading-input" style="font-size:13.5px; padding:7px 10px;" value="GENERACIÓN SOLAR • REGISTRO Y COBRO MENSUAL">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="display:block; font-size:11.5px; font-weight:700; margin-bottom:4px;">Código CSS / Personalización Avanzada (En Vivo):</label>
+          <textarea id="cfgCustomCss" class="code-editor-textarea" style="min-height: 110px;" placeholder="/* Ejemplo: cambiar colores o tamaños del sistema */"></textarea>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label style="font-size:11.5px; font-weight:700;">Código Fuente / Base de Datos JSON en Vivo:</label>
+            <button class="chip-btn" onclick="downloadCompleteHTMLSource()">⬇️ Descargar Código HTML Completo</button>
+          </div>
+          <textarea id="cfgFullJsonCode" class="code-editor-textarea" style="min-height: 180px;"></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+          <button class="btn" style="background: #f1f5f9; color: #475569;" onclick="closeGoogleCodeModal()">Cerrar</button>
+          <button class="btn btn-solar" onclick="saveGoogleCodeChanges()">💾 Aplicar y Guardar Cambios en el Servidor</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PARA VER FOTO DE MEDIDOR EN GRANDE -->
+  <div class="modal-overlay" id="photoPreviewModal" onclick="this.style.display='none'">
+    <div class="modal-box" style="max-width: 640px; text-align: center;" onclick="event.stopPropagation()">
+      <h3 id="photoPreviewTitle">Foto del Medidor</h3>
+      <img id="photoPreviewImg" src="" alt="Foto Medidor" style="max-width: 100%; max-height: 70vh; border-radius: 12px; margin: 10px 0;">
+      <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+        <a id="photoDownloadLink" class="btn btn-primary" download="medidor.jpg" style="text-decoration: none;">📥 Descargar Foto</a>
+        <button class="btn" style="background: #0f172a; color: #fff;" onclick="document.getElementById('photoPreviewModal').style.display='none'">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toastMsg">Guardado automáticamente</div>
+
+  <script>
+    // ================= 1. CONFIGURACIÓN INICIAL DE LOS 4 ADMINISTRADORES =================
+    const DEFAULT_ADMINS = [
+      { id: 'adm1', name: 'Débora', role: 'Administradora 1', pin: '1779', color: '#0284c7' },
+      { id: 'adm2', name: 'Admin 2', role: 'Administrador 2', pin: '1232', color: '#d97706' },
+      { id: 'adm3', name: 'Admin 3', role: 'Administrador 3', pin: '1233', color: '#16a34a' },
+      { id: 'adm4', name: 'Admin 4', role: 'Administrador 4', pin: '1234', color: '#7c3aed' }
+    ];
+
+    let appConfig = {
+      title: 'Cuentas Luz San Michell',
+      subtitle: 'GENERACIÓN SOLAR • REGISTRO Y COBRO MENSUAL',
+      customCss: '',
+      ownerGoogleEmail: ''
+    };
+    let currentVisualSubTab = 'table-img';
+    let isGoogleOwnerUnlocked = false;
+
+    // ================= 2. DATOS HISTÓRICOS EXACTOS EXTRAÍDOS DEL EXCEL =================
+    // Incluye Locales 1 al 30 + Local 31 (MALL CHINO) para Julio, Agosto, Septiembre y Octubre 2026
+    const INITIAL_MONTHS_DATA = [
+      {
+        id: '2026-07',
+        month: 'JULIO',
+        year: 2026,
+        priceKwh: 239,
+        records: [
+          { local: 1, rubro: 'VERDULERIA', prev: 22797, curr: 23781, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 2, rubro: 'PASTELERIA', prev: 29507, curr: 30426, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 3, rubro: 'FARMACIA', prev: 5558, curr: 5673, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 4, rubro: 'FARMACIA', prev: 14141, curr: 14443, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 5, rubro: 'ELECTRICIDAD', prev: 1830, curr: 1863, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 6, rubro: 'TALABARTERIA', prev: 1810, curr: 1852, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 7, rubro: 'LIDIA', prev: 9322, curr: 9500, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 8, rubro: 'HELADERIA', prev: 14320, curr: 14535, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 9, rubro: 'CARNICERIA', prev: 42142, curr: 43027, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 10, rubro: 'FERRETERIA', prev: 3022, curr: 3131, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 11, rubro: 'FERRETERIA', prev: 570, curr: 594, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 12, rubro: 'LISS PET', prev: 4297, curr: 4464, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 13, rubro: 'ASEO', prev: 3147, curr: 3252, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 14, rubro: 'CONFITERIA', prev: 7423, curr: 7621, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 15, rubro: '-', prev: 831, curr: 834, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 16, rubro: '-', prev: 831, curr: 834, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 17, rubro: 'DENTISTA', prev: 2365, curr: 2451, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 18, rubro: 'BATERIAS', prev: 943, curr: 980, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 19, rubro: 'MUPIM', prev: 3658, curr: 3715, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 20, rubro: '-', prev: 2359, curr: 2359, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 21, rubro: 'TECNOLOGIA', prev: 6281, curr: 6448, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 22, rubro: 'TERAPIAS', prev: 629, curr: 629, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 23, rubro: 'ALIMENTOS', prev: 850, curr: 853, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 24, rubro: 'BARBERIA', prev: 7730, curr: 7912, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 25, rubro: 'ACUPUNTURA', prev: 997, curr: 1037, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 26, rubro: '-', prev: 3203, curr: 3203, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 27, rubro: '-', prev: 1675, curr: 1675, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 28, rubro: 'SALON', prev: 3300, curr: 3400, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 29, rubro: 'OPTICA', prev: 4309, curr: 4671, manual: null, manualBy: '', exempt: false, paid: true },
+          { local: 30, rubro: '-', prev: 1711, curr: 1711, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 31, rubro: 'MALL CHINO', prev: 20155, curr: 21532, manual: null, manualBy: '', exempt: false, paid: true }
+        ]
+      },
+      {
+        id: '2026-08',
+        month: 'AGOSTO',
+        year: 2026,
+        priceKwh: 239,
+        records: [
+          { local: 1, rubro: 'VERDULERIA', prev: 23781, curr: 25287, manual: 25721, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 2, rubro: 'PASTELERIA', prev: 30426, curr: 31720, manual: 31989, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 3, rubro: 'FARMACIA', prev: 5673, curr: 5831, manual: 5855, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 4, rubro: 'FARMACIA', prev: 14443, curr: 14831, manual: 14884, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 5, rubro: 'ELECTRICIDAD', prev: 1863, curr: 1912, manual: 1918, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 6, rubro: 'TALABARTERIA', prev: 1852, curr: 1906, manual: 1913, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 7, rubro: 'LIDIA', prev: 9500, curr: 9766, manual: 9774, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 8, rubro: 'HELADERIA', prev: 14535, curr: 14780, manual: 14844, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 9, rubro: 'CARNICERIA', prev: 43027, curr: 44243, manual: 44555, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 10, rubro: 'FERRETERIA', prev: 3131, curr: 3265, manual: 3293, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 11, rubro: 'FERRETERIA', prev: 594, curr: 617, manual: 622, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 12, rubro: 'LISS PET', prev: 4464, curr: 4635, manual: 4654, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 13, rubro: 'ASEO', prev: 3252, curr: 3350, manual: 3361, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 14, rubro: 'CONFITERIA', prev: 7621, curr: 7831, manual: 7861, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 15, rubro: '-', prev: 834, curr: 838, manual: 838, manualBy: 'Débora (07/09/2026)', exempt: true, paid: true },
+          { local: 16, rubro: '-', prev: 834, curr: 838, manual: 838, manualBy: 'Débora (07/09/2026)', exempt: true, paid: true },
+          { local: 17, rubro: 'DENTISTA', prev: 2451, curr: 2538, manual: 2544, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 18, rubro: 'BATERIAS', prev: 980, curr: 1028, manual: 1037, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 19, rubro: 'MUPIM', prev: 3715, curr: 3792, manual: 3798, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 20, rubro: '-', prev: 2359, curr: 2363, manual: 2370, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 21, rubro: 'TECNOLOGIA', prev: 6448, curr: 6644, manual: 6655, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 22, rubro: 'TERAPIAS', prev: 629, curr: 629, manual: 634, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 23, rubro: 'ALIMENTOS', prev: 853, curr: 856, manual: 856, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 24, rubro: 'BARBERIA', prev: 7912, curr: 8119, manual: 8147, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 25, rubro: 'ACUPUNTURA', prev: 1037, curr: 1087, manual: 1088, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 26, rubro: '-', prev: 3203, curr: 3203, manual: 3203, manualBy: 'Débora (07/09/2026)', exempt: true, paid: true },
+          { local: 27, rubro: '-', prev: 1675, curr: 1675, manual: 1675, manualBy: 'Débora (07/09/2026)', exempt: true, paid: true },
+          { local: 28, rubro: 'SALON', prev: 3400, curr: 3504, manual: 3511, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 29, rubro: 'OPTICA', prev: 4671, curr: 5133, manual: 5178, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true },
+          { local: 30, rubro: '-', prev: 1711, curr: 1711, manual: 1711, manualBy: 'Débora (07/09/2026)', exempt: true, paid: true },
+          { local: 31, rubro: 'MALL CHINO', prev: 21532, curr: 22905, manual: 22905, manualBy: 'Débora (07/09/2026)', exempt: false, paid: true }
+        ]
+      },
+      {
+        id: '2026-09',
+        month: 'SEPTIEMBRE',
+        year: 2026,
+        priceKwh: 239,
+        records: [
+          { local: 1, rubro: 'VERDULERIA', prev: 25287, curr: 27963, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 2, rubro: 'PASTELERIA', prev: 31720, curr: 32836, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 3, rubro: 'FARMACIA', prev: 5831, curr: 5967, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 4, rubro: 'FARMACIA', prev: 14831, curr: 15113, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 5, rubro: 'ELECTRICIDAD', prev: 1912, curr: 1959, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 6, rubro: 'TALABARTERIA', prev: 1906, curr: 1955, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 7, rubro: 'LIDIA', prev: 9766, curr: 9864, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 8, rubro: 'HELADERIA', prev: 14780, curr: 15231, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 9, rubro: 'CARNICERIA', prev: 44243, curr: 45785, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 10, rubro: 'FERRETERIA', prev: 3265, curr: 3376, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 11, rubro: 'FERRETERIA', prev: 617, curr: 636, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 12, rubro: 'LISS PET', prev: 4635, curr: 4739, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 13, rubro: 'ASEO', prev: 3350, curr: 3421, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 14, rubro: 'CONFITERIA', prev: 7831, curr: 8007, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 15, rubro: '-', prev: 838, curr: 840, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 16, rubro: '-', prev: 838, curr: 840, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 17, rubro: 'DENTISTA', prev: 2538, curr: 2579, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 18, rubro: 'BATERIAS', prev: 1028, curr: 1061, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 19, rubro: 'MUPIM', prev: 3792, curr: 3853, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 20, rubro: 'BAZAR', prev: 2363, curr: 2393, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 21, rubro: 'TECNOLOGIA', prev: 6644, curr: 6733, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 22, rubro: 'TERAPIAS', prev: 629, curr: 661, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 23, rubro: '-', prev: 856, curr: 856, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 24, rubro: 'BARBERIA', prev: 8119, curr: 8280, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 25, rubro: 'ACUPUNTURA', prev: 1087, curr: 1105, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 26, rubro: '-', prev: 3203, curr: 3203, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 27, rubro: '-', prev: 1675, curr: 1675, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 28, rubro: 'SALON', prev: 3504, curr: 3544, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 29, rubro: 'OPTICA', prev: 5133, curr: 5369, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 30, rubro: '-', prev: 1711, curr: 1711, manual: null, manualBy: '', exempt: true, paid: true },
+          { local: 31, rubro: 'MALL CHINO', prev: 22905, curr: 23858, manual: null, manualBy: '', exempt: false, paid: false }
+        ]
+      },
+      {
+        id: '2026-10',
+        month: 'OCTUBRE',
+        year: 2026,
+        priceKwh: 239,
+        records: [
+          { local: 1, rubro: 'VERDULERIA', prev: 27963, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 2, rubro: 'PASTELERIA', prev: 32836, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 3, rubro: 'FARMACIA', prev: 5967, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 4, rubro: 'FARMACIA', prev: 15113, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 5, rubro: 'ELECTRICIDAD', prev: 1959, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 6, rubro: 'TALABARTERIA', prev: 1955, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 7, rubro: 'LIDIA', prev: 9864, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 8, rubro: 'HELADERIA', prev: 15231, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 9, rubro: 'CARNICERIA', prev: 45785, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 10, rubro: 'FERRETERIA', prev: 3376, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 11, rubro: 'FERRETERIA', prev: 636, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 12, rubro: 'LISS PET', prev: 4739, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 13, rubro: 'ASEO', prev: 3421, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 14, rubro: 'CONFITERIA', prev: 8007, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 15, rubro: '-', prev: 840, curr: null, manual: null, manualBy: '', exempt: true, paid: false },
+          { local: 16, rubro: '-', prev: 840, curr: null, manual: null, manualBy: '', exempt: true, paid: false },
+          { local: 17, rubro: 'DENTISTA', prev: 2579, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 18, rubro: 'BATERIAS', prev: 1061, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 19, rubro: 'MUPIM', prev: 3853, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 20, rubro: 'BAZAR', prev: 2393, curr: null, manual: null, manualBy: '', exempt: true, paid: false },
+          { local: 21, rubro: 'TECNOLOGIA', prev: 6733, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 22, rubro: 'TERAPIAS', prev: 661, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 23, rubro: '-', prev: 856, curr: null, manual: null, manualBy: '', exempt: true, paid: false },
+          { local: 24, rubro: 'BARBERIA', prev: 8280, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 25, rubro: 'ACUPUNTURA', prev: 1105, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 26, rubro: '-', prev: 3203, curr: null, manual: null, manualBy: '', exempt: true, paid: false },
+          { local: 27, rubro: '-', prev: 1675, curr: null, manual: null, manualBy: '', exempt: true, paid: false },
+          { local: 28, rubro: 'SALON', prev: 3544, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 29, rubro: 'OPTICA', prev: 5369, curr: null, manual: null, manualBy: '', exempt: false, paid: false },
+          { local: 30, rubro: '-', prev: 1711, curr: null, manual: null, manualBy: '', exempt: true, paid: false },
+          { local: 31, rubro: 'MALL CHINO', prev: 23858, curr: null, manual: null, manualBy: '', exempt: false, paid: false }
+        ]
+      }
+    ];
+
+    // ================= ESTADO DE LA APLICACIÓN =================
+    let admins = [];
+    let selectedLoginAdminId = 'adm1';
+    let enteredPin = '';
+    let activeAdmin = null;
+
+    let monthsData = [];
+    let currentMonthId = '2026-09';
+    let currentViewMode = 'cards'; // 'cards', 'table', 'visuals', 'history'
+
+    // Utilidades de formato
+    function fmtNum(n) {
+      if (n === null || typeof n === 'undefined' || isNaN(n)) return '—';
+      return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function fmtCLP(n) {
+      if (n === null || typeof n === 'undefined' || isNaN(n)) return '$0';
+      return '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // Cálculo de Consumo (kWh) y Valor ($) para un registro
+    function calcRecord(rec, priceKwh) {
+      const hasCurr = rec.curr !== null && rec.curr !== '' && !isNaN(rec.curr);
+      if (!hasCurr) {
+        return { hasCurr: false, kwh: 0, value: 0 };
+      }
+      const kwh = Math.max(0, Number(rec.curr) - Number(rec.prev || 0));
+      const value = rec.exempt ? 0 : Math.round(kwh * Number(priceKwh || 239));
+      return { hasCurr: true, kwh, value };
+    }
+
+    function applyAppConfigToDOM() {
+      if (!appConfig) return;
+      if (appConfig.title) {
+        document.title = `${appConfig.title} - Control Solar Locales`;
+        const h1 = document.getElementById('loginMainTitle');
+        const h2 = document.getElementById('headerMainTitle');
+        if (h1) h1.innerText = appConfig.title;
+        if (h2) h2.innerText = appConfig.title;
+      }
+      if (appConfig.subtitle) {
+        const sub = document.getElementById('headerSubTitle');
+        if (sub) sub.innerText = appConfig.subtitle;
+      }
+      const styleTag = document.getElementById('customOwnerStyles');
+      if (styleTag) styleTag.innerHTML = appConfig.customCss || '';
+    }
+
+    // ================= INICIALIZACIÓN Y SINCRONIZACIÓN EN VIVO =================
+    async function fetchServerData() {
+      // Compatible con Google Apps Script si está alojado en script.google.com
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler((data) => {
+          if (data) applyIncomingServerData(data);
+        }).getCloudAppData();
+        return;
+      }
+      if (window.location.protocol === 'file:') return;
+      try {
+        const res = await fetch('/api/data?t=' + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          applyIncomingServerData(data);
+        }
+      } catch (e) {
+        // Modo offline / localStorage
+      }
+    }
+
+    function applyIncomingServerData(data) {
+      if (!data) return;
+      if (Array.isArray(data.monthsData) && data.monthsData.length > 0) {
+        monthsData = data.monthsData;
+        localStorage.setItem('solar_locales_months_v1', JSON.stringify(monthsData));
+      }
+      if (Array.isArray(data.admins) && data.admins.length === 4) {
+        admins = data.admins;
+        localStorage.setItem('solar_locales_admins_v1', JSON.stringify(admins));
+      }
+      if (data.appConfig) {
+        appConfig = Object.assign({}, appConfig, data.appConfig);
+        localStorage.setItem('solar_locales_config_v1', JSON.stringify(appConfig));
+        applyAppConfigToDOM();
+      }
+      renderLoginAdmins();
+      if (activeAdmin) renderAll();
+    }
+
+    async function pushServerData() {
+      const payload = {
+        updatedAt: new Date().toISOString(),
+        updatedBy: activeAdmin ? activeAdmin.name : 'Admin',
+        admins,
+        monthsData,
+        appConfig
+      };
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.saveCloudAppData(payload);
+        return;
+      }
+      if (window.location.protocol === 'file:') return;
+      try {
+        await fetch('/api/data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        // Guardado en localStorage de respaldo
+      }
+    }
+
+    function initApp() {
+      const savedConfig = localStorage.getItem('solar_locales_config_v1');
+      if (savedConfig) {
+        try { appConfig = Object.assign({}, appConfig, JSON.parse(savedConfig)); } catch (e) {}
+      }
+      applyAppConfigToDOM();
+
+      const savedAdmins = localStorage.getItem('solar_locales_admins_v1');
+      if (savedAdmins) {
+        try {
+          admins = JSON.parse(savedAdmins);
+        } catch (e) {
+          admins = JSON.parse(JSON.stringify(DEFAULT_ADMINS));
+        }
+      } else {
+        admins = JSON.parse(JSON.stringify(DEFAULT_ADMINS));
+      }
+
+      const savedMonths = localStorage.getItem('solar_locales_months_v1');
+      if (savedMonths) {
+        try {
+          monthsData = JSON.parse(savedMonths);
+        } catch (e) {
+          monthsData = JSON.parse(JSON.stringify(INITIAL_MONTHS_DATA));
+        }
+      } else {
+        monthsData = JSON.parse(JSON.stringify(INITIAL_MONTHS_DATA));
+      }
+
+      const savedMonthId = localStorage.getItem('solar_locales_active_month_v1');
+      if (savedMonthId && monthsData.some(m => m.id === savedMonthId)) {
+        currentMonthId = savedMonthId;
+      } else {
+        currentMonthId = '2026-09';
+      }
+
+      renderLoginAdmins();
+
+      // Si ya había sesión activa en esta pestaña
+      const sessionAdminId = sessionStorage.getItem('solar_active_admin_id');
+      if (sessionAdminId) {
+        const found = admins.find(a => a.id === sessionAdminId);
+        if (found) {
+          loginSuccess(found);
+        }
+      }
+
+      // Sincronizar con el servidor al abrir y cada 12 segundos si no se está escribiendo
+      fetchServerData();
+      setInterval(() => {
+        const activeTag = document.activeElement ? document.activeElement.tagName : '';
+        const modalOpen = document.getElementById('googleCodeModal')?.style.display === 'flex';
+        if (activeTag !== 'INPUT' && activeTag !== 'SELECT' && activeTag !== 'TEXTAREA' && !modalOpen) {
+          fetchServerData();
+        }
+      }, 12000);
+    }
+
+    // ================= SISTEMA DE LOGIN DE LOS 4 ADMINISTRADORES =================
+    function renderLoginAdmins() {
+      const grid = document.getElementById('loginAdminGrid');
+      grid.innerHTML = '';
+
+      admins.forEach(adm => {
+        const isSel = adm.id === selectedLoginAdminId;
+        const initial = (adm.name || 'A').trim().charAt(0).toUpperCase();
+        const btn = document.createElement('div');
+        btn.className = `admin-select-btn ${isSel ? 'selected' : ''}`;
+        btn.onclick = () => {
+          selectedLoginAdminId = adm.id;
+          enteredPin = '';
+          updatePinDots();
+          renderLoginAdmins();
+          document.getElementById('pinPromptLabel').innerText = `Ingresa el PIN de ${adm.name}`;
+        };
+        btn.innerHTML = `
+          <div class="admin-avatar" style="background: ${adm.color};">${initial}</div>
+          <div class="admin-name">${adm.name}</div>
+          <div class="admin-role">${adm.role}</div>
+        `;
+        grid.appendChild(btn);
+      });
+    }
+
+    function pressPin(digit) {
+      if (enteredPin.length >= 4) return;
+      enteredPin += digit;
+      updatePinDots();
+
+      if (enteredPin.length === 4) {
+        setTimeout(verifyPin, 120);
+      }
+    }
+
+    function backspacePin() {
+      enteredPin = enteredPin.slice(0, -1);
+      updatePinDots();
+    }
+
+    function clearPin() {
+      enteredPin = '';
+      updatePinDots();
+    }
+
+    function updatePinDots() {
+      const dots = document.querySelectorAll('#pinDots .pin-dot');
+      dots.forEach((d, idx) => {
+        if (idx < enteredPin.length) d.classList.add('filled');
+        else d.classList.remove('filled');
+      });
+    }
+
+    function verifyPin() {
+      const adm = admins.find(a => a.id === selectedLoginAdminId);
+      if (!adm) return;
+
+      if (enteredPin === adm.pin) {
+        loginSuccess(adm);
+      } else {
+        showToast('❌ PIN incorrecto. Intenta nuevamente.');
+        enteredPin = '';
+        updatePinDots();
+      }
+    }
+
+    function isSuperAdmin() {
+      return activeAdmin && activeAdmin.id === 'adm1';
+    }
+
+    function handleAdminPillClick() {
+      if (isSuperAdmin()) {
+        openAdminsModal();
+      }
+    }
+
+    function loginSuccess(adm) {
+      activeAdmin = adm;
+      sessionStorage.setItem('solar_active_admin_id', adm.id);
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('currentAdminBadge').innerText = adm.name;
+
+      // Solo Débora (adm1) puede ver y usar las opciones de administrar usuarios, claves y código con Google
+      const isDebora = adm.id === 'adm1';
+      const btnManage = document.getElementById('btnManageAdmins');
+      const btnGoogle = document.getElementById('btnGoogleCode');
+      const gearIcon = document.getElementById('adminGearIcon');
+      const pill = document.getElementById('activeAdminPill');
+      if (btnManage) btnManage.style.display = isDebora ? 'inline-flex' : 'none';
+      if (btnGoogle) btnGoogle.style.display = isDebora ? 'inline-flex' : 'none';
+      if (gearIcon) gearIcon.style.display = isDebora ? 'inline' : 'none';
+      if (pill) {
+        pill.style.cursor = isDebora ? 'pointer' : 'default';
+        pill.title = isDebora ? 'Configurar los 4 Administradores y Claves (Exclusivo Débora)' : `Sesión activa: ${adm.name}`;
+      }
+
+      enteredPin = '';
+      updatePinDots();
+      populateHistorySelect();
+      populateReceiptLocalSelect();
+      renderAll();
+      showToast(`👋 ¡Hola ${adm.name}! Sesión iniciada.`);
+    }
+
+    function lockSession() {
+      sessionStorage.removeItem('solar_active_admin_id');
+      activeAdmin = null;
+      isGoogleOwnerUnlocked = false;
+      enteredPin = '';
+      updatePinDots();
+      renderLoginAdmins();
+      document.getElementById('loginScreen').style.display = 'flex';
+    }
+
+    // Permitir teclado físico en login
+    document.addEventListener('keydown', (e) => {
+      const loginVisible = document.getElementById('loginScreen').style.display !== 'none';
+      if (!loginVisible) return;
+      if (e.key >= '0' && e.key <= '9') {
+        pressPin(e.key);
+      } else if (e.key === 'Backspace') {
+        backspacePin();
+      } else if (e.key === 'Escape') {
+        clearPin();
+      }
+    });
+
+    // ================= RENDERIZADO GENERAL =================
+    function getCurrentMonthObj() {
+      return monthsData.find(m => m.id === currentMonthId) || monthsData[monthsData.length - 1];
+    }
+
+    function saveData() {
+      localStorage.setItem('solar_locales_months_v1', JSON.stringify(monthsData));
+      localStorage.setItem('solar_locales_active_month_v1', currentMonthId);
+      localStorage.setItem('solar_locales_config_v1', JSON.stringify(appConfig));
+      pushServerData();
+    }
+
+    function renderAll() {
+      renderMonthTabs();
+      renderKPIs();
+      renderCurrentView();
+    }
+
+    function renderMonthTabs() {
+      const container = document.getElementById('monthTabsContainer');
+      container.innerHTML = '';
+
+      monthsData.forEach(m => {
+        const btn = document.createElement('button');
+        btn.className = `month-tab ${m.id === currentMonthId ? 'active' : ''}`;
+        btn.innerText = `${m.month} ${m.year}`;
+        btn.onclick = () => {
+          currentMonthId = m.id;
+          saveData();
+          renderAll();
+        };
+        container.appendChild(btn);
+      });
+
+      const curMonth = getCurrentMonthObj();
+      if (curMonth) {
+        document.getElementById('tariffInput').value = curMonth.priceKwh;
+        document.getElementById('tableMonthTitle').innerText = `${curMonth.month} ${curMonth.year}`;
+        document.getElementById('tableTariffSubtitle').innerText = `PRECIO kWh: $${curMonth.priceKwh}`;
+      }
+    }
+
+    function renderKPIs() {
+      const curMonth = getCurrentMonthObj();
+      if (!curMonth) return;
+
+      let localesKwh = 0;
+      let localesMoney = 0;
+      let mallKwh = 0;
+      let mallMoney = 0;
+      let readingsCount = 0;
+      let paidMoney = 0;
+      let pendingMoney = 0;
+
+      curMonth.records.forEach(r => {
+        const { hasCurr, kwh, value } = calcRecord(r, curMonth.priceKwh);
+        if (hasCurr) readingsCount++;
+
+        if (r.local === 31) {
+          mallKwh += kwh;
+          mallMoney += value;
+        } else {
+          localesKwh += kwh;
+          localesMoney += value;
+        }
+
+        if (r.paid) {
+          paidMoney += value;
+        } else {
+          pendingMoney += value;
+        }
+      });
+
+      const totalKwh = localesKwh + mallKwh;
+      const totalMoney = localesMoney + mallMoney;
+
+      document.getElementById('kpiLocalesMoney').innerText = fmtCLP(localesMoney);
+      document.getElementById('kpiLocalesKwh').innerText = `${fmtNum(localesKwh)} kWh (Locales 1 al 30)`;
+
+      document.getElementById('kpiMallMoney').innerText = fmtCLP(mallMoney);
+      document.getElementById('kpiMallKwh').innerText = `${fmtNum(mallKwh)} kWh consumidos`;
+
+      document.getElementById('kpiFinalMoney').innerText = fmtCLP(totalMoney);
+      document.getElementById('kpiFinalKwh').innerText = `${fmtNum(totalKwh)} kWh energía solar total`;
+
+      document.getElementById('kpiProgressReadings').innerText = `${readingsCount} / ${curMonth.records.length} leídos`;
+      document.getElementById('kpiPaidSummary').innerText = `Pagado: ${fmtCLP(paidMoney)} • Por cobrar: ${fmtCLP(pendingMoney)}`;
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      document.getElementById('btnViewCards').classList.toggle('active', mode === 'cards');
+      document.getElementById('btnViewTable').classList.toggle('active', mode === 'table');
+      document.getElementById('btnViewVisuals').classList.toggle('active', mode === 'visuals');
+      document.getElementById('btnViewHistory').classList.toggle('active', mode === 'history');
+
+      document.getElementById('viewCardsContainer').style.display = mode === 'cards' ? 'grid' : 'none';
+      document.getElementById('viewTableContainer').style.display = mode === 'table' ? 'block' : 'none';
+      document.getElementById('viewVisualsContainer').style.display = mode === 'visuals' ? 'block' : 'none';
+      document.getElementById('viewHistoryContainer').style.display = mode === 'history' ? 'block' : 'none';
+
+      renderCurrentView();
+    }
+
+    function getFilteredRecords(records) {
+      const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+      const status = document.getElementById('statusFilter')?.value || 'all';
+      const curMonth = getCurrentMonthObj();
+
+      return records.filter(r => {
+        const labelLocal = r.local === 31 ? '31 mall chino' : `local ${r.local} ${r.rubro}`.toLowerCase();
+        if (q && !labelLocal.includes(q) && !String(r.local).includes(q)) {
+          return false;
+        }
+
+        const { hasCurr, value } = calcRecord(r, curMonth.priceKwh);
+        if (status === 'pending-reading') return !hasCurr;
+        if (status === 'with-reading') return hasCurr;
+        if (status === 'unpaid') return !r.paid && value > 0;
+        if (status === 'paid') return r.paid;
+        if (status === 'exempt') return r.exempt || r.rubro === '-';
+        return true;
+      });
+    }
+
+    function renderCurrentView() {
+      if (currentViewMode === 'cards') {
+        renderCardsView();
+      } else if (currentViewMode === 'table') {
+        renderTableView();
+      } else if (currentViewMode === 'visuals') {
+        renderVisualsView();
+      } else {
+        renderHistoryView();
+      }
+    }
+
+    // ================= VISTA 1: TARJETAS MÓVILES =================
+    function renderCardsView() {
+      const curMonth = getCurrentMonthObj();
+      const container = document.getElementById('viewCardsContainer');
+      container.innerHTML = '';
+
+      const filtered = getFilteredRecords(curMonth.records);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; background: #fff; padding: 32px; border-radius: 14px; text-align: center; color: #64748b;">
+            No se encontraron locales con ese filtro.
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(r => {
+        const { hasCurr, kwh, value } = calcRecord(r, curMonth.priceKwh);
+
+        let statusClass = 'status-pending-reading';
+        if (r.exempt) statusClass = 'status-exempt';
+        else if (r.paid && hasCurr) statusClass = 'status-paid';
+        else if (hasCurr) statusClass = 'status-ready';
+
+        const card = document.createElement('div');
+        card.className = `meter-card ${statusClass} ${r.local === 31 ? 'mall-chino-card' : ''}`;
+
+        const localTitle = r.local === 31 ? 'LOCAL 31 • ESPECIAL' : `LOCAL ${r.local}`;
+
+        card.innerHTML = `
+          <div class="meter-card-header">
+            <span class="local-badge">${localTitle}</span>
+            <input type="text" class="local-rubro-input" value="${r.rubro}" placeholder="Nombre / Rubro"
+              onchange="updateRecordField(${r.local}, 'rubro', this.value)" title="Toca para editar el rubro o nombre del local">
+          </div>
+
+          <div class="readings-row">
+            <div class="reading-field">
+              <label>Lectura Anterior</label>
+              <input type="number" inputmode="numeric" class="reading-input" value="${r.prev !== null ? r.prev : ''}"
+                onchange="updateRecordField(${r.local}, 'prev', this.value)">
+            </div>
+            <div class="reading-field">
+              <label style="color: #0284c7;">Lectura Actual ✏️</label>
+              <input type="number" inputmode="numeric" class="reading-input actual-input" placeholder="Ingresar..."
+                value="${r.curr !== null && r.curr !== '' ? r.curr : ''}"
+                onchange="updateRecordField(${r.local}, 'curr', this.value)">
+            </div>
+          </div>
+
+          <div class="calc-result-row">
+            <div class="calc-item">
+              <span class="lbl">Consumo Mes</span>
+              <span class="val-kwh">${hasCurr ? fmtNum(kwh) + ' kWh' : 'Pendiente'}</span>
+            </div>
+            <div class="calc-item" style="text-align: right;">
+              <span class="lbl">${r.exempt ? 'Local Exento / Sin Cobro' : 'Valor a Cobrar'}</span>
+              <span class="val-clp">${hasCurr ? fmtCLP(value) : '—'}</span>
+            </div>
+          </div>
+
+          <div class="manual-reading-bar">
+            <span>📝 Lectura Manual: <strong style="color:#0f172a;">${r.manualBy || 'Opcional'}</strong></span>
+            <input type="number" inputmode="numeric" placeholder="Ej. 25721" value="${r.manual !== null && r.manual !== '' ? r.manual : ''}"
+              onchange="updateRecordField(${r.local}, 'manual', this.value)">
+          </div>
+
+          <div class="card-footer-actions">
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button class="chip-btn ${r.paid ? 'paid' : 'unpaid'}" onclick="toggleRecordPaid(${r.local})">
+                ${r.paid ? '✅ PAGADO' : '⏳ PENDIENTE'}
+              </button>
+              <button class="chip-btn ${r.exempt ? 'exempt' : ''}" onclick="toggleRecordExempt(${r.local})" title="Marcar local vacío o sin cobro">
+                ${r.exempt ? '⚪ Sin Cobro' : '💲 Con Cobro'}
+              </button>
+            </div>
+
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+              <button class="chip-btn" style="background: #eff6ff; color: #1d4ed8; border-color: #93c5fd;" onclick="openReceiptImgForLocal(${r.local})" title="Ver y descargar boleta en imagen">
+                🖼️ Boleta Imagen
+              </button>
+              <button class="chip-btn" style="background: #dcfce7; color: #166534; border-color: #86efac;" onclick="sendLocalReceiptWhatsApp(${r.local})">
+                📲 WhatsApp
+              </button>
+            </div>
+          </div>
+          ${r.updatedBy ? `<div class="audit-stamp">✓ Editado por ${r.updatedBy}</div>` : ''}
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // ================= VISTA 2: TABLA COMPLETA (IGUAL AL EXCEL) =================
+    function renderTableView() {
+      const curMonth = getCurrentMonthObj();
+      const tbody = document.getElementById('solarTableBody');
+      tbody.innerHTML = '';
+
+      const filtered = getFilteredRecords(curMonth.records);
+      let sumLocalesKwh = 0;
+      let sumLocalesVal = 0;
+      let mallKwh = 0;
+      let mallVal = 0;
+
+      // Calculamos totales globales de locales 1..30 y 31
+      curMonth.records.forEach(r => {
+        const { kwh, value } = calcRecord(r, curMonth.priceKwh);
+        if (r.local === 31) {
+          mallKwh += kwh;
+          mallVal += value;
+        } else {
+          sumLocalesKwh += kwh;
+          sumLocalesVal += value;
+        }
+      });
+
+      const regularFiltered = filtered.filter(r => r.local !== 31);
+      const mallFiltered = filtered.find(r => r.local === 31);
+
+      regularFiltered.forEach(r => {
+        tbody.appendChild(createTableRow(r, curMonth.priceKwh, false));
+      });
+
+      // Fila TOTAL LOCALES (1 al 30)
+      const trTotalLocales = document.createElement('tr');
+      trTotalLocales.className = 'row-total-locales';
+      trTotalLocales.innerHTML = `
+        <td colspan="4">TOTAL LOCALES (1 AL 30)</td>
+        <td style="text-align: right; font-family: 'Outfit', sans-serif; font-size: 15px;">${fmtNum(sumLocalesKwh)} kWh</td>
+        <td style="text-align: right; font-family: 'Outfit', sans-serif; font-size: 15px; color: #b45309;">${fmtCLP(sumLocalesVal)}</td>
+        <td colspan="3"></td>
+      `;
+      tbody.appendChild(trTotalLocales);
+
+      // Fila Local 31: MALL CHINO
+      if (mallFiltered) {
+        tbody.appendChild(createTableRow(mallFiltered, curMonth.priceKwh, true));
+      }
+
+      // Fila TOTAL FINAL
+      const trTotalFinal = document.createElement('tr');
+      trTotalFinal.className = 'row-total-final';
+      trTotalFinal.innerHTML = `
+        <td colspan="4">☀️ TOTAL FINAL (LOCALES + MALL CHINO)</td>
+        <td style="text-align: right; font-family: 'Outfit', sans-serif; font-size: 16px; color: #fcd34d !important;">${fmtNum(sumLocalesKwh + mallKwh)} kWh</td>
+        <td style="text-align: right; font-family: 'Outfit', sans-serif; font-size: 17px; color: #fcd34d !important;">${fmtCLP(sumLocalesVal + mallVal)}</td>
+        <td colspan="3"></td>
+      `;
+      tbody.appendChild(trTotalFinal);
+    }
+
+    function createTableRow(r, priceKwh, isMall) {
+      const { hasCurr, kwh, value } = calcRecord(r, priceKwh);
+      const tr = document.createElement('tr');
+      if (isMall) tr.className = 'row-mall-chino';
+
+      tr.innerHTML = `
+        <td style="font-weight: 800; color: #0f172a;">${r.local}</td>
+        <td>
+          <input type="text" class="tbl-rubro-input" value="${r.rubro}"
+            onchange="updateRecordField(${r.local}, 'rubro', this.value)">
+        </td>
+        <td style="text-align: right;">
+          <input type="number" inputmode="numeric" class="tbl-input" value="${r.prev !== null ? r.prev : ''}"
+            onchange="updateRecordField(${r.local}, 'prev', this.value)">
+        </td>
+        <td style="text-align: right;">
+          <input type="number" inputmode="numeric" class="tbl-input" style="border-color: #0284c7; background: #f0f9ff;"
+            placeholder="—" value="${r.curr !== null && r.curr !== '' ? r.curr : ''}"
+            onchange="updateRecordField(${r.local}, 'curr', this.value)">
+        </td>
+        <td style="text-align: right; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 14px;">
+          ${hasCurr ? fmtNum(kwh) : '—'}
+        </td>
+        <td style="text-align: right; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 14.5px; color: ${r.exempt ? '#94a3b8' : '#0f172a'};">
+          ${hasCurr ? fmtCLP(value) : '—'}
+        </td>
+        <td style="text-align: right;">
+          <input type="number" inputmode="numeric" class="tbl-input" style="width: 80px; font-size: 12.5px;"
+            placeholder="—" value="${r.manual !== null && r.manual !== '' ? r.manual : ''}"
+            onchange="updateRecordField(${r.local}, 'manual', this.value)"
+            title="${r.manualBy || 'Lectura manual intermedia'}">
+        </td>
+        <td style="text-align: center;">
+          <div style="display: inline-flex; gap: 4px;">
+            <button class="chip-btn ${r.paid ? 'paid' : 'unpaid'}" onclick="toggleRecordPaid(${r.local})">
+              ${r.paid ? 'Pagado' : 'Pendiente'}
+            </button>
+            <button class="chip-btn ${r.exempt ? 'exempt' : ''}" onclick="toggleRecordExempt(${r.local})" title="Alternar cobro / exento">
+              ${r.exempt ? 'Exento' : '$'}
+            </button>
+          </div>
+        </td>
+        <td class="no-print" style="text-align: center;">
+          <div style="display: inline-flex; gap: 4px;">
+            <button class="chip-btn" style="background: #eff6ff; color: #1d4ed8; border-color: #93c5fd;" onclick="openReceiptImgForLocal(${r.local})" title="Ver Boleta en Imagen">
+              🖼️
+            </button>
+            <button class="chip-btn" style="background: #dcfce7; color: #166534; border-color: #86efac;" onclick="sendLocalReceiptWhatsApp(${r.local})" title="Enviar cobro por WhatsApp">
+              📲
+            </button>
+          </div>
+        </td>
+      `;
+      return tr;
+    }
+
+    // ================= VISTA 4: CONSUMOS COMO TABLAS E IMÁGENES =================
+    function setVisualSubTab(tab) {
+      currentVisualSubTab = tab;
+      document.getElementById('visBtnTableImg').classList.toggle('active', tab === 'table-img');
+      document.getElementById('visBtnRanking').classList.toggle('active', tab === 'ranking');
+      document.getElementById('visBtnReceiptImg').classList.toggle('active', tab === 'receipt-img');
+      document.getElementById('visBtnPhotos').classList.toggle('active', tab === 'photos');
+
+      document.getElementById('visSectionTableImg').style.display = tab === 'table-img' ? 'block' : 'none';
+      document.getElementById('visSectionRanking').style.display = tab === 'ranking' ? 'block' : 'none';
+      document.getElementById('visSectionReceiptImg').style.display = tab === 'receipt-img' ? 'block' : 'none';
+      document.getElementById('visSectionPhotos').style.display = tab === 'photos' ? 'block' : 'none';
+
+      renderVisualsView();
+    }
+
+    function populateReceiptLocalSelect() {
+      const sel = document.getElementById('receiptLocalSelect');
+      if (!sel) return;
+      const curVal = sel.value || '1';
+      const curMonth = getCurrentMonthObj();
+      if (!curMonth) return;
+      sel.innerHTML = curMonth.records.map(r =>
+        `<option value="${r.local}">Local ${r.local} - ${r.rubro}</option>`
+      ).join('');
+      sel.value = curVal;
+    }
+
+    function openReceiptImgForLocal(localNum) {
+      populateReceiptLocalSelect();
+      const sel = document.getElementById('receiptLocalSelect');
+      if (sel) sel.value = String(localNum);
+      setViewMode('visuals');
+      setVisualSubTab('receipt-img');
+    }
+
+    function renderVisualsView() {
+      populateReceiptLocalSelect();
+      if (currentVisualSubTab === 'table-img') {
+        renderTableImageCanvas();
+      } else if (currentVisualSubTab === 'ranking') {
+        renderRankingAndChartCanvas();
+      } else if (currentVisualSubTab === 'receipt-img') {
+        renderReceiptImageCanvas();
+      } else if (currentVisualSubTab === 'photos') {
+        renderMeterPhotosGrid();
+      }
+    }
+
+    // 1. GENERADOR DE IMAGEN DE TABLA COMPLETA DEL MES (PNG)
+    function renderTableImageCanvas() {
+      const canvas = document.getElementById('tableImageCanvas');
+      if (!canvas) return;
+      const curMonth = getCurrentMonthObj();
+      if (!curMonth) return;
+
+      const filterType = document.getElementById('imgTableFilterSelect')?.value || 'all';
+      const rowsToDraw = curMonth.records.filter(r => {
+        const { hasCurr, kwh, value } = calcRecord(r, curMonth.priceKwh);
+        if (filterType === 'with-consumption') return hasCurr && kwh > 0 && !r.exempt;
+        if (filterType === 'unpaid') return !r.paid && value > 0 && !r.exempt;
+        if (filterType === 'paid') return r.paid && !r.exempt;
+        return true;
+      });
+
+      const rowHeight = 36;
+      const headerHeight = 145;
+      const tableHeaderH = 42;
+      const footerHeight = 135;
+      const totalH = headerHeight + tableHeaderH + (Math.max(1, rowsToDraw.length) * rowHeight) + footerHeight;
+
+      canvas.width = 1080;
+      canvas.height = totalH;
+      const ctx = canvas.getContext('2d');
+
+      // Fondo general
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Banner superior oscuro
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, 120);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(0, 116, canvas.width, 4);
+
+      // Textos del encabezado
+      ctx.fillStyle = '#fcd34d';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText('☀️ ENERGÍA SOLAR • REPORTE OFICIAL DE CONSUMOS', 36, 40);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 32px sans-serif';
+      ctx.fillText(`${(appConfig.title || 'CUENTAS LUZ SAN MICHELL').toUpperCase()} — ${curMonth.month} ${curMonth.year}`, 36, 80);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '600 15px sans-serif';
+      ctx.fillText(`Tarifa Solar: $${curMonth.priceKwh} / kWh   •   Fecha emisión: ${new Date().toLocaleDateString('es-CL')}`, 36, 105);
+
+      // Encabezado de columnas de tabla
+      const yStart = 135;
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(24, yStart, canvas.width - 48, tableHeaderH);
+
+      ctx.fillStyle = '#fcd34d';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('LOCAL', 40, yStart + 26);
+      ctx.fillText('RUBRO / LOCATARIO', 125, yStart + 26);
+      ctx.textAlign = 'right';
+      ctx.fillText('LECT. ANTERIOR', 500, yStart + 26);
+      ctx.fillText('LECT. ACTUAL', 640, yStart + 26);
+      ctx.fillText('CONSUMO', 775, yStart + 26);
+      ctx.fillText('VALOR ($)', 915, yStart + 26);
+      ctx.textAlign = 'center';
+      ctx.fillText('ESTADO', 995, yStart + 26);
+
+      let y = yStart + tableHeaderH;
+      let sumLocalesKwh = 0, sumLocalesVal = 0, mallKwh = 0, mallVal = 0;
+
+      curMonth.records.forEach(r => {
+        const { kwh, value } = calcRecord(r, curMonth.priceKwh);
+        if (r.local === 31) {
+          mallKwh += kwh;
+          mallVal += value;
+        } else {
+          sumLocalesKwh += kwh;
+          sumLocalesVal += value;
+        }
+      });
+
+      rowsToDraw.forEach((r, idx) => {
+        const { hasCurr, kwh, value } = calcRecord(r, curMonth.priceKwh);
+        if (r.local === 31) {
+          ctx.fillStyle = '#fffbeb';
+        } else {
+          ctx.fillStyle = idx % 2 === 0 ? '#ffffff' : '#f1f5f9';
+        }
+        ctx.fillRect(24, y, canvas.width - 48, rowHeight);
+
+        // Línea divisoria
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.beginPath();
+        ctx.moveTo(24, y + rowHeight);
+        ctx.lineTo(canvas.width - 24, y + rowHeight);
+        ctx.stroke();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(r.local === 31 ? '31 (Mall)' : `Local ${r.local}`, 40, y + 23);
+
+        ctx.font = '600 14px sans-serif';
+        ctx.fillText(String(r.rubro || '-').slice(0, 24), 125, y + 23);
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#475569';
+        ctx.fillText(fmtNum(r.prev), 500, y + 23);
+
+        ctx.fillStyle = '#0284c7';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText(hasCurr ? fmtNum(r.curr) : 'Pendiente', 640, y + 23);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText(hasCurr ? `${fmtNum(kwh)} kWh` : '—', 775, y + 23);
+
+        ctx.fillStyle = r.exempt ? '#94a3b8' : '#b45309';
+        ctx.font = 'bold 15px sans-serif';
+        ctx.fillText(hasCurr ? fmtCLP(value) : '—', 915, y + 23);
+
+        // Estado badge
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 12px sans-serif';
+        if (r.exempt) {
+          ctx.fillStyle = '#64748b';
+          ctx.fillText('EXENTO', 995, y + 23);
+        } else if (r.paid) {
+          ctx.fillStyle = '#15803d';
+          ctx.fillText('PAGADO', 995, y + 23);
+        } else {
+          ctx.fillStyle = '#dc2626';
+          ctx.fillText('PENDIENTE', 995, y + 23);
+        }
+
+        y += rowHeight;
+      });
+
+      // Fila Resumen Locales 1 al 30
+      y += 8;
+      ctx.fillStyle = '#fef3c7';
+      ctx.fillRect(24, y, canvas.width - 48, 38);
+      ctx.fillStyle = '#92400e';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('🏢 SUBTOTAL LOCALES (1 AL 30)  |  🏮 MALL CHINO (31): ' + fmtNum(mallKwh) + ' kWh (' + fmtCLP(mallVal) + ')', 40, y + 24);
+      ctx.textAlign = 'right';
+      ctx.fillText(`${fmtNum(sumLocalesKwh)} kWh`, 775, y + 24);
+      ctx.fillText(fmtCLP(sumLocalesVal), 915, y + 24);
+
+      // Fila Total Final
+      y += 44;
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(24, y, canvas.width - 48, 48);
+      ctx.fillStyle = '#fcd34d';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`☀️ TOTAL GENERAL ${curMonth.month} ${curMonth.year} (LOCALES + MALL CHINO)`, 40, y + 30);
+      ctx.textAlign = 'right';
+      ctx.fillText(`${fmtNum(sumLocalesKwh + mallKwh)} kWh`, 775, y + 30);
+      ctx.fillText(fmtCLP(sumLocalesVal + mallVal), 915, y + 30);
+      ctx.textAlign = 'left';
+    }
+
+    // 2. TABLA RANKING Y GRÁFICO DE BARRAS EN IMAGEN (PNG)
+    function renderRankingAndChartCanvas() {
+      const curMonth = getCurrentMonthObj();
+      if (!curMonth) return;
+
+      let totalMonthKwh = 0;
+      const items = curMonth.records.map(r => {
+        const { hasCurr, kwh, value } = calcRecord(r, curMonth.priceKwh);
+        totalMonthKwh += kwh;
+        return { ...r, hasCurr, kwh, value };
+      }).sort((a, b) => b.kwh - a.kwh);
+
+      // Llenar tabla HTML de Ranking
+      const tbody = document.getElementById('rankingTableBody');
+      if (tbody) {
+        tbody.innerHTML = '';
+        items.forEach((it, idx) => {
+          const pct = totalMonthKwh > 0 ? ((it.kwh / totalMonthKwh) * 100).toFixed(1) : '0.0';
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="font-weight: 900; color: ${idx < 3 ? '#d97706' : '#64748b'};">#${idx + 1}</td>
+            <td style="font-weight: 800;">Local ${it.local}</td>
+            <td style="font-weight: 700;">${it.rubro}</td>
+            <td style="text-align: right;">${fmtNum(it.prev)}</td>
+            <td style="text-align: right;">${it.hasCurr ? fmtNum(it.curr) : 'Pendiente'}</td>
+            <td style="text-align: right; font-weight: 800;">${fmtNum(it.kwh)} kWh</td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="flex: 1; height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden;">
+                  <div style="width: ${Math.min(100, Number(pct))}%; height: 100%; background: linear-gradient(90deg, #f59e0b, #0284c7);"></div>
+                </div>
+                <span style="font-size: 11.5px; font-weight: 700; min-width: 42px; text-align: right;">${pct}%</span>
+              </div>
+            </td>
+            <td style="text-align: right; font-weight: 800; color: #b45309;">${fmtCLP(it.value)}</td>
+            <td style="text-align: center;">${it.exempt ? '⚪ Exento' : (it.paid ? '✅ Pagado' : '⏳ Pendiente')}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Dibujar Gráfico en Canvas
+      const canvas = document.getElementById('chartImageCanvas');
+      if (!canvas) return;
+      const topItems = items.filter(i => i.kwh > 0).slice(0, 18);
+      const rowH = 38;
+      canvas.width = 1080;
+      canvas.height = Math.max(420, 170 + topItems.length * rowH + 60);
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#fcd34d';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('☀️ RANKING VISUAL DE CONSUMO ELÉCTRICO SOLAR', 40, 42);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 28px sans-serif';
+      ctx.fillText(`${appConfig.title || 'Cuentas Luz San Michell'} — ${curMonth.month} ${curMonth.year}`, 40, 78);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 14px sans-serif';
+      ctx.fillText(`Consumo Total del Mes: ${fmtNum(totalMonthKwh)} kWh   •   Precio kWh: $${curMonth.priceKwh}`, 40, 105);
+
+      const maxKwh = topItems.length > 0 ? Math.max(1, topItems[0].kwh) : 1;
+      let y = 140;
+
+      if (topItems.length === 0) {
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = 'bold 18px sans-serif';
+        ctx.fillText('Aún no hay lecturas con consumo ingresadas en este mes.', 40, 220);
+        return;
+      }
+
+      topItems.forEach((it, idx) => {
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 13.5px sans-serif';
+        ctx.textAlign = 'left';
+        const label = `#${idx + 1} Loc.${it.local} (${String(it.rubro).slice(0, 14)})`;
+        ctx.fillText(label, 40, y + 22);
+
+        const barX = 275;
+        const maxBarW = 540;
+        const barW = Math.max(10, Math.round((it.kwh / maxKwh) * maxBarW));
+
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(barX, y + 6, maxBarW, 22);
+
+        const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+        grad.addColorStop(0, '#f59e0b');
+        grad.addColorStop(1, '#38bdf8');
+        ctx.fillStyle = grad;
+        ctx.fillRect(barX, y + 6, barW, 22);
+
+        ctx.fillStyle = '#fcd34d';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(`${fmtNum(it.kwh)} kWh  •  ${fmtCLP(it.value)}`, 1040, y + 22);
+
+        y += rowH;
+      });
+      ctx.textAlign = 'left';
+    }
+
+    // 3. GENERADOR DE BOLETA / COMPROBANTE EN IMAGEN POR LOCAL (PNG)
+    function renderReceiptImageCanvas() {
+      const canvas = document.getElementById('receiptImageCanvas');
+      if (!canvas) return;
+      const curMonth = getCurrentMonthObj();
+      if (!curMonth) return;
+
+      const localNum = Number(document.getElementById('receiptLocalSelect')?.value || 1);
+      const rec = curMonth.records.find(r => r.local === localNum) || curMonth.records[0];
+      if (!rec) return;
+
+      const { hasCurr, kwh, value } = calcRecord(rec, curMonth.priceKwh);
+
+      canvas.width = 760;
+      canvas.height = 820;
+      const ctx = canvas.getContext('2d');
+
+      // Fondo exterior
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Tarjeta blanca central
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(32, 32, canvas.width - 64, canvas.height - 64);
+
+      // Cabecera oscura de la boleta
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(32, 32, canvas.width - 64, 150);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(32, 178, canvas.width - 64, 6);
+
+      ctx.fillStyle = '#fcd34d';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('☀️ ENERGÍA SOLAR • COMPROBANTE DE CONSUMO DE LUZ', canvas.width / 2, 75);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 32px sans-serif';
+      ctx.fillText((appConfig.title || 'CUENTAS LUZ SAN MICHELL').toUpperCase(), canvas.width / 2, 118);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillText(`PERÍODO: ${curMonth.month} ${curMonth.year}`, canvas.width / 2, 154);
+
+      // Nombre del Local
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 28px sans-serif';
+      const localHeader = rec.local === 31 ? 'LOCAL 31 • MALL CHINO' : `LOCAL N° ${rec.local} — ${rec.rubro}`;
+      ctx.fillText(localHeader, canvas.width / 2, 240);
+
+      // Cajas de lecturas
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(68, 275, canvas.width - 136, 260);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(68, 275, canvas.width - 136, 260);
+
+      const drawRow = (label, val, yPos, highlight) => {
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#475569';
+        ctx.font = '600 18px sans-serif';
+        ctx.fillText(label, 96, yPos);
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = highlight ? '#0284c7' : '#0f172a';
+        ctx.font = 'bold 21px sans-serif';
+        ctx.fillText(val, canvas.width - 96, yPos);
+      };
+
+      drawRow('Lectura Anterior del Medidor:', `${fmtNum(rec.prev)} kWh`, 325, false);
+      drawRow('Lectura Actual del Medidor:', hasCurr ? `${fmtNum(rec.curr)} kWh` : 'Pendiente', 380, true);
+      drawRow('Consumo del Mes (Actual - Anterior):', hasCurr ? `${fmtNum(kwh)} kWh` : '—', 435, false);
+      drawRow('Valor Tarifa Solar Aplicada:', `$${curMonth.priceKwh} por kWh`, 490, false);
+
+      // Caja Total a Pagar
+      ctx.fillStyle = '#fffbeb';
+      ctx.fillRect(68, 560, canvas.width - 136, 120);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.strokeRect(68, 560, canvas.width - 136, 120);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#92400e';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText(rec.exempt ? 'LOCAL EXENTO / SIN COBRO' : 'TOTAL A PAGAR DEL MES', canvas.width / 2, 595);
+
+      ctx.fillStyle = '#b45309';
+      ctx.font = 'bold 44px sans-serif';
+      ctx.fillText(hasCurr ? fmtCLP(value) : 'PENDIENTE', canvas.width / 2, 652);
+
+      // Estado de Pago
+      ctx.fillStyle = rec.paid ? '#15803d' : '#dc2626';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText(rec.paid ? 'ESTADO: ✅ PAGADO' : 'ESTADO: ⏳ PENDIENTE DE PAGO', canvas.width / 2, 730);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 13px sans-serif';
+      ctx.fillText(`Generado por ${activeAdmin ? activeAdmin.name : 'Administración'} • ${new Date().toLocaleString('es-CL')}`, canvas.width / 2, 765);
+      ctx.textAlign = 'left';
+    }
+
+    // DESCARGAR O COMPARTIR IMAGEN DE CANVAS
+    function downloadCanvasAsPNG(canvasId, baseName) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const curMonth = getCurrentMonthObj();
+      const link = document.createElement('a');
+      link.download = `${baseName}_${curMonth.month}_${curMonth.year}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('📸 Imagen PNG descargada con éxito');
+    }
+
+    async function shareCanvasImage(canvasId, baseName) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const curMonth = getCurrentMonthObj();
+      const fileName = `${baseName}_${curMonth.month}_${curMonth.year}.png`;
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], fileName, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              title: `${appConfig.title} - ${curMonth.month} ${curMonth.year}`,
+              text: ` Consumo de Luz Solar (${curMonth.month} ${curMonth.year})`,
+              files: [file]
+            });
+            return;
+          } catch (e) {}
+        }
+        // Si está en PC o el navegador no soporta compartir archivos directo, descarga la imagen
+        downloadCanvasAsPNG(canvasId, baseName);
+      }, 'image/png');
+    }
+
+    // 4. GALERÍA DE FOTOS DE MEDIDORES POR LOCAL
+    function renderMeterPhotosGrid() {
+      const grid = document.getElementById('meterPhotosGrid');
+      if (!grid) return;
+      const curMonth = getCurrentMonthObj();
+      grid.innerHTML = '';
+
+      curMonth.records.forEach(r => {
+        const { hasCurr, kwh, value } = calcRecord(r, curMonth.priceKwh);
+        const card = document.createElement('div');
+        card.className = 'photo-item-card';
+        const hasPhoto = Boolean(r.photoData);
+
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="font-size: 13.5px; color: #0f172a;">Local ${r.local} • ${r.rubro}</strong>
+            <span style="font-size: 11.5px; font-weight: 700; color: #b45309;">${hasCurr ? fmtNum(kwh) + ' kWh' : 'Sin lectura'}</span>
+          </div>
+          <div class="photo-thumb-box">
+            ${hasPhoto
+              ? `<img src="${r.photoData}" alt="Medidor Local ${r.local}" onclick="previewMeterPhoto(${r.local})" title="Toca para ampliar">`
+              : `<div style="text-align: center; color: #64748b; font-size: 12px; padding: 10px;">📷 Sin foto del medidor<br><span style="font-size:10.5px;">Lect. Actual: ${hasCurr ? fmtNum(r.curr) : '—'}</span></div>`
+            }
+          </div>
+          <div style="display: flex; gap: 6px; justify-content: space-between;">
+            <label class="chip-btn" style="flex: 1; justify-content: center; background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; cursor: pointer;">
+              📸 ${hasPhoto ? 'Cambiar Foto' : 'Subir / Tomar Foto'}
+              <input type="file" accept="image/*" capture="environment" style="display: none;" onchange="handleMeterPhotoUpload(event, ${r.local})">
+            </label>
+            ${hasPhoto ? `<button class="chip-btn unpaid" onclick="deleteMeterPhoto(${r.local})" title="Eliminar foto">🗑️</button>` : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function handleMeterPhotoUpload(event, localNum) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 720;
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          const c = document.createElement('canvas');
+          c.width = w;
+          c.height = h;
+          const ctx = c.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressedDataUrl = c.toDataURL('image/jpeg', 0.72);
+
+          const curMonth = getCurrentMonthObj();
+          const rec = curMonth.records.find(r => r.local === localNum);
+          if (rec) {
+            rec.photoData = compressedDataUrl;
+            rec.updatedBy = getNowStamp();
+            saveData();
+            renderMeterPhotosGrid();
+            showToast(`📷 Foto del medidor guardada en Local ${localNum}`);
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewMeterPhoto(localNum) {
+      const curMonth = getCurrentMonthObj();
+      const rec = curMonth.records.find(r => r.local === localNum);
+      if (!rec || !rec.photoData) return;
+      document.getElementById('photoPreviewTitle').innerText = `Local ${rec.local} (${rec.rubro}) - ${curMonth.month} ${curMonth.year}`;
+      document.getElementById('photoPreviewImg').src = rec.photoData;
+      const dl = document.getElementById('photoDownloadLink');
+      dl.href = rec.photoData;
+      dl.download = `Medidor_Local_${rec.local}_${curMonth.month}_${curMonth.year}.jpg`;
+      document.getElementById('photoPreviewModal').style.display = 'flex';
+    }
+
+    function deleteMeterPhoto(localNum) {
+      if (!confirm(`¿Eliminar la foto del medidor del Local ${localNum}?`)) return;
+      const curMonth = getCurrentMonthObj();
+      const rec = curMonth.records.find(r => r.local === localNum);
+      if (rec) {
+        delete rec.photoData;
+        saveData();
+        renderMeterPhotosGrid();
+        showToast(`Foto eliminada del Local ${localNum}`);
+      }
+    }
+
+    // ================= MODAL 4: EDICIÓN DE CÓDIGO EXCLUSIVA CON CUENTA DE GOOGLE =================
+    function openGoogleCodeModal() {
+      if (!isSuperAdmin()) {
+        showToast('🔒 Solo la cuenta propietaria (Débora) puede acceder al editor de código con Google.');
+        return;
+      }
+      const emailInp = document.getElementById('googleOwnerEmailInput');
+      const statusTxt = document.getElementById('googleOwnerStatusText');
+      if (appConfig.ownerGoogleEmail) {
+        statusTxt.innerText = `Cuenta Google propietaria registrada: ${appConfig.ownerGoogleEmail}. Confirma tu correo para desbloquear el código.`;
+      } else {
+        statusTxt.innerText = `Registra tu correo de Google (@gmail.com) para vincularlo como único propietario del código.`;
+      }
+      if (emailInp && !emailInp.value && appConfig.ownerGoogleEmail) {
+        emailInp.value = '';
+      }
+
+      document.getElementById('cfgAppTitle').value = appConfig.title || 'Cuentas Luz San Michell';
+      document.getElementById('cfgAppSubtitle').value = appConfig.subtitle || 'GENERACIÓN SOLAR • REGISTRO Y COBRO MENSUAL';
+      document.getElementById('cfgCustomCss').value = appConfig.customCss || '';
+      document.getElementById('cfgFullJsonCode').value = JSON.stringify({ appConfig, admins, monthsData }, null, 2);
+
+      document.getElementById('googleCodeEditorPanel').style.display = isGoogleOwnerUnlocked ? 'block' : 'none';
+      document.getElementById('googleAuthLockBox').style.display = isGoogleOwnerUnlocked ? 'none' : 'block';
+      document.getElementById('googleCodeModal').style.display = 'flex';
+    }
+
+    function closeGoogleCodeModal() {
+      document.getElementById('googleCodeModal').style.display = 'none';
+    }
+
+    function verifyGoogleOwnerAccess() {
+      if (!isSuperAdmin()) {
+        showToast('🔒 Acceso denegado.');
+        return;
+      }
+      const enteredEmail = (document.getElementById('googleOwnerEmailInput')?.value || '').trim().toLowerCase();
+      if (!enteredEmail || !enteredEmail.includes('@')) {
+        alert('Por favor ingresa tu correo de Google válido (ejemplo: tucorreo@gmail.com).');
+        return;
+      }
+
+      if (!appConfig.ownerGoogleEmail) {
+        appConfig.ownerGoogleEmail = enteredEmail;
+        saveData();
+        showToast(`✅ Cuenta Google ${enteredEmail} vinculada como propietaria exclusiva.`);
+      } else if (enteredEmail !== appConfig.ownerGoogleEmail.toLowerCase()) {
+        showToast('❌ Ese correo de Google no coincide con la cuenta propietaria autorizada.');
+        return;
+      }
+
+      isGoogleOwnerUnlocked = true;
+      document.getElementById('verifiedGoogleBadge').innerText = `✅ Edición habilitada para: ${appConfig.ownerGoogleEmail}`;
+      document.getElementById('cfgFullJsonCode').value = JSON.stringify({ appConfig, admins, monthsData }, null, 2);
+      document.getElementById('googleAuthLockBox').style.display = 'none';
+      document.getElementById('googleCodeEditorPanel').style.display = 'block';
+    }
+
+    function lockGoogleCodeEditor() {
+      isGoogleOwnerUnlocked = false;
+      document.getElementById('googleCodeEditorPanel').style.display = 'none';
+      document.getElementById('googleAuthLockBox').style.display = 'block';
+    }
+
+    function saveGoogleCodeChanges() {
+      if (!isSuperAdmin() || !isGoogleOwnerUnlocked) {
+        showToast('🔒 Debes verificar tu cuenta de Google primero.');
+        return;
+      }
+      try {
+        const parsed = JSON.parse(document.getElementById('cfgFullJsonCode').value);
+        if (parsed.monthsData && Array.isArray(parsed.monthsData)) {
+          monthsData = parsed.monthsData;
+        }
+        if (parsed.admins && Array.isArray(parsed.admins) && parsed.admins.length === 4) {
+          admins = parsed.admins;
+          localStorage.setItem('solar_locales_admins_v1', JSON.stringify(admins));
+        }
+        if (parsed.appConfig) {
+          appConfig = Object.assign({}, appConfig, parsed.appConfig);
+        }
+      } catch (e) {
+        alert('El código JSON tiene un error de formato. Revisa las comillas o comas.');
+        return;
+      }
+
+      appConfig.title = document.getElementById('cfgAppTitle').value.trim() || 'Cuentas Luz San Michell';
+      appConfig.subtitle = document.getElementById('cfgAppSubtitle').value.trim() || 'GENERACIÓN SOLAR • REGISTRO Y COBRO MENSUAL';
+      appConfig.customCss = document.getElementById('cfgCustomCss').value || '';
+
+      applyAppConfigToDOM();
+      saveData();
+      renderAll();
+      closeGoogleCodeModal();
+      showToast('✓ ¡Código y configuración guardados por la cuenta de Google propietaria!');
+    }
+
+    function downloadCompleteHTMLSource() {
+      if (!isSuperAdmin() || !isGoogleOwnerUnlocked) return;
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'Cuentas_Luz_San_Michell.html';
+      a.click();
+      showToast('⬇️ Código fuente HTML descargado');
+    }
+
+    // ================= VISTA 3: HISTORIAL Y COMPARATIVA =================
+    function populateHistorySelect() {
+      const sel = document.getElementById('historyLocalSelect');
+      if (!sel) return;
+      const curMonth = getCurrentMonthObj();
+      sel.innerHTML = curMonth.records.map(r =>
+        `<option value="${r.local}">Local ${r.local} - ${r.rubro}</option>`
+      ).join('');
+    }
+
+    function renderHistoryView() {
+      const chartContainer = document.getElementById('monthlyComparisonChart');
+      chartContainer.innerHTML = '';
+
+      let maxMoney = 1;
+      const summaries = monthsData.map(m => {
+        let totalKwh = 0;
+        let totalMoney = 0;
+        m.records.forEach(r => {
+          const { kwh, value } = calcRecord(r, m.priceKwh);
+          totalKwh += kwh;
+          totalMoney += value;
+        });
+        if (totalMoney > maxMoney) maxMoney = totalMoney;
+        return { label: `${m.month} ${m.year}`, totalKwh, totalMoney };
+      });
+
+      summaries.forEach(s => {
+        const pct = Math.max(4, Math.round((s.totalMoney / maxMoney) * 100));
+        const row = document.createElement('div');
+        row.className = 'bar-chart-row';
+        row.innerHTML = `
+          <div class="bar-label">${s.label}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: ${pct}%;"></div>
+          </div>
+          <div class="bar-value">${fmtNum(s.totalKwh)} kWh • ${fmtCLP(s.totalMoney)}</div>
+        `;
+        chartContainer.appendChild(row);
+      });
+
+      // Tabla de historial por local
+      const selLocal = Number(document.getElementById('historyLocalSelect')?.value || 1);
+      const tbody = document.getElementById('localHistoryTableBody');
+      tbody.innerHTML = '';
+
+      monthsData.forEach(m => {
+        const rec = m.records.find(r => r.local === selLocal);
+        if (!rec) return;
+        const { hasCurr, kwh, value } = calcRecord(rec, m.priceKwh);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 800;">${m.month} ${m.year}</td>
+          <td>${rec.rubro}</td>
+          <td style="text-align: right;">${fmtNum(rec.prev)}</td>
+          <td style="text-align: right; font-weight: 700;">${hasCurr ? fmtNum(rec.curr) : 'Pendiente'}</td>
+          <td style="text-align: right; font-weight: 800;">${hasCurr ? fmtNum(kwh) + ' kWh' : '—'}</td>
+          <td style="text-align: right; font-weight: 800; color: #b45309;">${hasCurr ? fmtCLP(value) : '—'}</td>
+          <td>${rec.exempt ? '⚪ Sin Cobro' : (rec.paid ? '✅ Pagado' : '⏳ Pendiente')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ================= ACTUALIZACIÓN DE LECTURAS Y DATOS =================
+    function getNowStamp() {
+      const now = new Date();
+      const d = String(now.getDate()).padStart(2, '0');
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const h = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+      const admName = activeAdmin ? activeAdmin.name : 'Admin';
+      return `${admName} (${d}/${m} ${h}:${min})`;
+    }
+
+    function updateRecordField(localNum, field, rawVal) {
+      const curMonth = getCurrentMonthObj();
+      const rec = curMonth.records.find(r => r.local === localNum);
+      if (!rec) return;
+
+      if (field === 'rubro') {
+        rec.rubro = (rawVal || '-').trim().toUpperCase();
+      } else if (field === 'prev') {
+        rec.prev = rawVal === '' ? 0 : Number(rawVal);
+      } else if (field === 'curr') {
+        rec.curr = rawVal === '' ? null : Number(rawVal);
+        // Si existe el mes siguiente, actualizamos automáticamente su Lectura Anterior
+        syncNextMonthPrevReading(curMonth.id, localNum, rec.curr);
+      } else if (field === 'manual') {
+        rec.manual = rawVal === '' ? null : Number(rawVal);
+        rec.manualBy = rawVal === '' ? '' : getNowStamp();
+      }
+
+      rec.updatedBy = getNowStamp();
+      saveData();
+      renderKPIs();
+      renderCurrentView();
+      showToast(`✓ Local ${localNum} actualizado por ${activeAdmin ? activeAdmin.name : 'Admin'}`);
+    }
+
+    function syncNextMonthPrevReading(currMonthId, localNum, newCurrVal) {
+      if (newCurrVal === null || isNaN(newCurrVal)) return;
+      const idx = monthsData.findIndex(m => m.id === currMonthId);
+      if (idx !== -1 && idx + 1 < monthsData.length) {
+        const nextMonth = monthsData[idx + 1];
+        const nextRec = nextMonth.records.find(r => r.local === localNum);
+        if (nextRec) {
+          nextRec.prev = Number(newCurrVal);
+        }
+      }
+    }
+
+    function toggleRecordPaid(localNum) {
+      const curMonth = getCurrentMonthObj();
+      const rec = curMonth.records.find(r => r.local === localNum);
+      if (!rec) return;
+      rec.paid = !rec.paid;
+      rec.updatedBy = getNowStamp();
+      saveData();
+      renderKPIs();
+      renderCurrentView();
+      showToast(`Local ${localNum}: marcado como ${rec.paid ? 'PAGADO ✅' : 'PENDIENTE ⏳'}`);
+    }
+
+    function toggleRecordExempt(localNum) {
+      const curMonth = getCurrentMonthObj();
+      const rec = curMonth.records.find(r => r.local === localNum);
+      if (!rec) return;
+      rec.exempt = !rec.exempt;
+      rec.updatedBy = getNowStamp();
+      saveData();
+      renderKPIs();
+      renderCurrentView();
+      showToast(`Local ${localNum}: ${rec.exempt ? 'Exento / Sin cobro ($0)' : 'Con cobro normal'}`);
+    }
+
+    function updateMonthTariff(newVal) {
+      const curMonth = getCurrentMonthObj();
+      const num = Number(newVal);
+      if (!curMonth || isNaN(num) || num <= 0) return;
+      curMonth.priceKwh = num;
+      saveData();
+      renderAll();
+      showToast(`⚡ Precio kWh actualizado a $${num} para ${curMonth.month}`);
+    }
+
+    // ================= COMPROBANTE INDIVIDUAL POR WHATSAPP =================
+    function sendLocalReceiptWhatsApp(localNum) {
+      const curMonth = getCurrentMonthObj();
+      const rec = curMonth.records.find(r => r.local === localNum);
+      if (!rec) return;
+
+      const { hasCurr, kwh, value } = calcRecord(rec, curMonth.priceKwh);
+      const localLabel = rec.local === 31 ? 'MALL CHINO (Local 31)' : `Local ${rec.local} (${rec.rubro})`;
+
+      const text = [
+        `☀️ *${(appConfig.title || 'CUENTAS LUZ SAN MICHELL').toUpperCase()} - ${curMonth.month} ${curMonth.year}*`,
+        `📍 *${localLabel}*`,
+        `────────────────────`,
+        `• Lectura Anterior: *${fmtNum(rec.prev)} kWh*`,
+        `• Lectura Actual: *${hasCurr ? fmtNum(rec.curr) + ' kWh' : 'Pendiente'}*`,
+        `• Consumo del Mes: *${hasCurr ? fmtNum(kwh) + ' kWh' : '—'}*`,
+        `• Tarifa Solar: *$${curMonth.priceKwh} / kWh*`,
+        `────────────────────`,
+        `💰 *TOTAL A PAGAR: ${fmtCLP(value)}*`,
+        `Estado: ${rec.paid ? '✅ PAGADO' : '⏳ PENDIENTE DE PAGO'}`
+      ].join('\n');
+
+      const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    // ================= MODAL DE LOS 4 ADMINISTRADORES (EXCLUSIVO DÉBORA) =================
+    function openAdminsModal() {
+      if (!isSuperAdmin()) {
+        showToast('🔒 Acceso restringido: Solo Débora puede ver o modificar administradores y claves.');
+        return;
+      }
+
+      const container = document.getElementById('adminsEditContainer');
+      container.innerHTML = '';
+
+      admins.forEach((adm, idx) => {
+        const row = document.createElement('div');
+        row.className = 'admin-edit-row';
+        row.style.gridTemplateColumns = '1fr 1fr 115px';
+        row.innerHTML = `
+          <input type="text" id="editAdmName_${idx}" value="${adm.name}" placeholder="Nombre">
+          <input type="text" id="editAdmRole_${idx}" value="${adm.role}" placeholder="Cargo">
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <input type="password" id="editAdmPin_${idx}" value="${adm.pin}" maxlength="4" inputmode="numeric" pattern="\\d{4}" placeholder="••••" style="letter-spacing: 2px; text-align: center;">
+            <button type="button" class="chip-btn" style="padding: 6px 8px;" onclick="togglePinEye(${idx})" title="Mostrar / ocultar clave">👁️</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById('adminsModal').style.display = 'flex';
+    }
+
+    function togglePinEye(idx) {
+      if (!isSuperAdmin()) return;
+      const inp = document.getElementById(`editAdmPin_${idx}`);
+      if (!inp) return;
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function closeAdminsModal() {
+      document.getElementById('adminsModal').style.display = 'none';
+    }
+
+    function saveAdminsConfig() {
+      if (!isSuperAdmin()) {
+        showToast('🔒 Acceso restringido: Solo Débora puede modificar claves.');
+        return;
+      }
+
+      for (let i = 0; i < admins.length; i++) {
+        const name = document.getElementById(`editAdmName_${i}`).value.trim() || `Admin ${i + 1}`;
+        const role = document.getElementById(`editAdmRole_${i}`).value.trim() || `Administrador ${i + 1}`;
+        const pin = document.getElementById(`editAdmPin_${i}`).value.trim();
+
+        if (!/^\d{4}$/.test(pin)) {
+          alert(`El PIN de ${name} debe tener exactamente 4 números (ej. 1234).`);
+          return;
+        }
+
+        admins[i].name = name;
+        admins[i].role = role;
+        admins[i].pin = pin;
+      }
+
+      localStorage.setItem('solar_locales_admins_v1', JSON.stringify(admins));
+      pushServerData();
+      if (activeAdmin) {
+        const updatedActive = admins.find(a => a.id === activeAdmin.id);
+        if (updatedActive) {
+          activeAdmin = updatedActive;
+          document.getElementById('currentAdminBadge').innerText = activeAdmin.name;
+        }
+      }
+      renderLoginAdmins();
+      closeAdminsModal();
+      showToast('✓ ¡Administradores y claves actualizados por Débora!');
+    }
+
+    // ================= CREAR NUEVO MES =================
+    function openNewMonthModal() {
+      const lastMonth = monthsData[monthsData.length - 1];
+      if (lastMonth) {
+        document.getElementById('newMonthTariff').value = lastMonth.priceKwh || 239;
+        document.getElementById('newMonthYear').value = lastMonth.year || 2026;
+      }
+      document.getElementById('newMonthModal').style.display = 'flex';
+    }
+
+    function closeNewMonthModal() {
+      document.getElementById('newMonthModal').style.display = 'none';
+    }
+
+    function confirmCreateNewMonth() {
+      const mName = document.getElementById('newMonthName').value;
+      const mYear = Number(document.getElementById('newMonthYear').value) || 2026;
+      const mTariff = Number(document.getElementById('newMonthTariff').value) || 239;
+
+      const lastMonth = monthsData[monthsData.length - 1];
+      const newId = `${mYear}-${mName}-${Date.now().toString().slice(-3)}`;
+
+      const newRecords = lastMonth.records.map(r => ({
+        local: r.local,
+        rubro: r.rubro,
+        prev: (r.curr !== null && r.curr !== '') ? Number(r.curr) : Number(r.prev || 0),
+        curr: null,
+        manual: null,
+        manualBy: '',
+        exempt: r.exempt,
+        paid: false
+      }));
+
+      monthsData.push({
+        id: newId,
+        month: mName,
+        year: mYear,
+        priceKwh: mTariff,
+        records: newRecords
+      });
+
+      currentMonthId = newId;
+      saveData();
+      closeNewMonthModal();
+      renderAll();
+      showToast(`✓ ¡Mes ${mName} ${mYear} creado con lecturas anteriores listas!`);
+    }
+
+    // ================= SINCRONIZACIÓN Y EXPORTACIÓN =================
+    function openSyncModal() {
+      document.getElementById('syncModal').style.display = 'flex';
+    }
+
+    function closeSyncModal() {
+      document.getElementById('syncModal').style.display = 'none';
+    }
+
+    function shareMonthSummaryWhatsApp() {
+      const curMonth = getCurrentMonthObj();
+      let sumLocalesKwh = 0, sumLocalesVal = 0, mallKwh = 0, mallVal = 0;
+
+      const lines = [`☀️ *REPORTE ${(appConfig.title || 'CUENTAS LUZ SAN MICHELL').toUpperCase()} - ${curMonth.month} ${curMonth.year}* (kWh: $${curMonth.priceKwh})\n`];
+
+      curMonth.records.forEach(r => {
+        const { hasCurr, kwh, value } = calcRecord(r, curMonth.priceKwh);
+        if (r.local === 31) {
+          mallKwh += kwh;
+          mallVal += value;
+        } else {
+          sumLocalesKwh += kwh;
+          sumLocalesVal += value;
+        }
+        if (hasCurr && value > 0) {
+          lines.push(`• Loc ${r.local} (${r.rubro}): ${fmtNum(kwh)} kWh → *${fmtCLP(value)}* ${r.paid ? '✅' : '⏳'}`);
+        }
+      });
+
+      lines.push(`\n🏢 *Total Locales (1-30):* ${fmtNum(sumLocalesKwh)} kWh | *${fmtCLP(sumLocalesVal)}*`);
+      lines.push(`🏮 *Mall Chino (31):* ${fmtNum(mallKwh)} kWh | *${fmtCLP(mallVal)}*`);
+      lines.push(`☀️ *TOTAL FINAL:* ${fmtNum(sumLocalesKwh + mallKwh)} kWh | *${fmtCLP(sumLocalesVal + mallVal)}*`);
+
+      window.open(`https://wa.me/?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+    }
+
+    function downloadFullBackupJSON() {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        exportedBy: activeAdmin ? activeAdmin.name : 'Admin',
+        appConfig,
+        monthsData
+      };
+      if (isSuperAdmin()) {
+        payload.admins = admins;
+      }
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `respaldo_cuentas_luz_san_michell_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      showToast('⬇️ Archivo de respaldo descargado');
+    }
+
+    function uploadFullBackupJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed.monthsData && Array.isArray(parsed.monthsData)) {
+            monthsData = parsed.monthsData;
+            if (parsed.admins && Array.isArray(parsed.admins)) {
+              admins = parsed.admins;
+              localStorage.setItem('solar_locales_admins_v1', JSON.stringify(admins));
+            }
+            if (parsed.appConfig) {
+              appConfig = Object.assign({}, appConfig, parsed.appConfig);
+              applyAppConfigToDOM();
+            }
+            currentMonthId = monthsData[monthsData.length - 1].id;
+            saveData();
+            renderAll();
+            closeSyncModal();
+            showToast('✓ ¡Datos sincronizados y actualizados con éxito!');
+          } else {
+            alert('El archivo seleccionado no tiene un formato válido.');
+          }
+        } catch (err) {
+          alert('Error al leer el archivo de respaldo.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function exportCurrentMonthCSV() {
+      const curMonth = getCurrentMonthObj();
+      let rows = [
+        [`${curMonth.month}`, `${curMonth.year}`, '', 'PRECIO Kwh:', `${curMonth.priceKwh}`, '', ''],
+        ['LOCAL', 'RUBRO', 'LECTURA ANTERIOR', 'LECTURA ACTUAL', 'CONSUMO', 'VALOR', 'ESTADO PAGO']
+      ];
+
+      let sumLocalesKwh = 0, sumLocalesVal = 0;
+
+      curMonth.records.forEach(r => {
+        const { hasCurr, kwh, value } = calcRecord(r, curMonth.priceKwh);
+        if (r.local !== 31) {
+          sumLocalesKwh += kwh;
+          sumLocalesVal += value;
+          rows.push([
+            r.local,
+            `"${r.rubro}"`,
+            r.prev,
+            hasCurr ? r.curr : '',
+            hasCurr ? kwh : '',
+            hasCurr ? value : 0,
+            r.paid ? 'PAGADO' : 'PENDIENTE'
+          ]);
+        }
+      });
+
+      rows.push(['TOTAL LOCALES', '', '', '', sumLocalesKwh, sumLocalesVal, '']);
+
+      const mall = curMonth.records.find(r => r.local === 31);
+      if (mall) {
+        const { hasCurr, kwh, value } = calcRecord(mall, curMonth.priceKwh);
+        rows.push([
+          31,
+          `"${mall.rubro}"`,
+          mall.prev,
+          hasCurr ? mall.curr : '',
+          hasCurr ? kwh : '',
+          hasCurr ? value : 0,
+          mall.paid ? 'PAGADO' : 'PENDIENTE'
+        ]);
+        rows.push(['TOTAL FINAL', '', '', '', sumLocalesKwh + kwh, sumLocalesVal + value, '']);
+      }
+
+      const csvContent = '\uFEFF' + rows.map(e => e.join(';')).join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Cuentas_Luz_San_Michell_${curMonth.month}_${curMonth.year}.csv`;
+      a.click();
+      showToast(`📥 Descargado CSV de ${curMonth.month} ${curMonth.year}`);
+    }
+
+    function printTableReport() {
+      setViewMode('table');
+      setTimeout(() => window.print(), 150);
+    }
+
+    function resetToFactoryData() {
+      if (confirm('¿Deseas restaurar los datos originales de Julio, Agosto, Septiembre y Octubre 2026?')) {
+        monthsData = JSON.parse(JSON.stringify(INITIAL_MONTHS_DATA));
+        currentMonthId = '2026-09';
+        saveData();
+        renderAll();
+        closeSyncModal();
+        showToast('✓ Datos originales restaurados');
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    window.onload = initApp;
+  </script>
+</body>
+</html>
