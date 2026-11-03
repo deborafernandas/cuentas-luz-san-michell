@@ -1042,32 +1042,169 @@
       transform: translateY(0);
     }
 
+    @page {
+      size: letter portrait;
+      margin: 5mm 8mm;
+    }
+
+    .print-only-header {
+      display: none;
+    }
+
     @media print {
       .login-screen,
       .app-header,
+      .month-tariff-bar,
       .controls-toolbar,
       .modal-overlay,
       .toast,
-      .no-print {
+      .no-print,
+      #viewCardsContainer,
+      #viewVisualsContainer,
+      #viewHistoryContainer {
         display: none !important;
       }
-      body {
+      html, body {
         background: #fff !important;
         padding: 0 !important;
+        margin: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        font-size: 10px !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
       .main-container {
         max-width: 100% !important;
+        width: 100% !important;
         padding: 0 !important;
+        margin: 0 !important;
       }
-      .table-wrapper {
-        border: none !important;
+      .print-only-header {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        background: #0f172a !important;
+        color: #ffffff !important;
+        padding: 5px 10px !important;
+        border-radius: 6px !important;
+        margin-bottom: 5px !important;
+        border-bottom: 2px solid #f59e0b !important;
+      }
+      .print-only-header .print-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 13px !important;
+        font-weight: 800;
+        color: #fcd34d !important;
+      }
+      .print-only-header .print-meta {
+        font-size: 10.5px !important;
+        font-weight: 700;
+        color: #ffffff !important;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 6px !important;
+        margin-bottom: 5px !important;
+      }
+      .kpi-card {
+        padding: 4px 8px !important;
+        border-radius: 6px !important;
         box-shadow: none !important;
+      }
+      .kpi-card .kpi-label {
+        font-size: 8px !important;
+        margin-bottom: 1px !important;
+      }
+      .kpi-card .kpi-val {
+        font-size: 13px !important;
+        line-height: 1.1 !important;
+      }
+      .kpi-card .kpi-sub {
+        font-size: 8px !important;
+        margin-top: 1px !important;
+      }
+      #viewTableContainer {
+        display: block !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 6px !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      #viewTableContainer > div:first-child {
+        display: none !important;
+      }
+      .solar-table {
+        width: 100% !important;
+        min-width: 0 !important;
+        border-collapse: collapse !important;
+      }
+      .solar-table th {
+        padding: 3.5px 6px !important;
+        font-size: 9px !important;
+        line-height: 1.1 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .solar-table td {
+        padding: 1.8px 6px !important;
+        font-size: 10px !important;
+        line-height: 1.15 !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+      }
+      .solar-table tr {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .solar-table tr.row-total-locales td {
+        padding: 3px 6px !important;
+        font-size: 10.5px !important;
+      }
+      .solar-table tr.row-total-final td {
+        padding: 4px 6px !important;
+        font-size: 11px !important;
       }
       .solar-table th,
       .solar-table tr.row-total-locales,
+      .solar-table tr.row-mall-chino,
       .solar-table tr.row-total-final {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+      }
+      .tbl-input,
+      .tbl-rubro-input {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        height: auto !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        font-size: 10px !important;
+        line-height: 1.15 !important;
+        box-shadow: none !important;
+        color: #0f172a !important;
+        -webkit-appearance: none;
+        -moz-appearance: textfield;
+        appearance: none;
+      }
+      .tbl-input::-webkit-outer-spin-button,
+      .tbl-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      .chip-btn {
+        padding: 1px 6px !important;
+        font-size: 8.5px !important;
+        border-radius: 4px !important;
+        line-height: 1.1 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .chip-btn.print-hide-dollar {
+        display: none !important;
       }
     }
 
@@ -1260,6 +1397,12 @@
   <!-- ================= CONTENIDO PRINCIPAL ================= -->
   <main class="main-container">
 
+    <!-- ENCABEZADO COMPACTO EXCLUSIVO PARA IMPRESIÓN EN 1 HOJA CARTA -->
+    <div class="print-only-header">
+      <span class="print-title" id="printHeaderTitle">☀️ CUENTAS LUZ SAN MICHELL — RESUMEN MENSUAL</span>
+      <span class="print-meta" id="printHeaderMeta">SEPTIEMBRE 2026 • PRECIO kWh: $239</span>
+    </div>
+
     <!-- SELECTOR DE MES Y PRECIO KWH -->
     <div class="month-tariff-bar">
       <div class="months-scroll" id="monthTabsContainer">
@@ -1351,7 +1494,7 @@
             <th class="num">Lectura Actual</th>
             <th class="num">Consumo (kWh)</th>
             <th class="num">Valor ($)</th>
-            <th class="num">Lectura Manual</th>
+            <th class="num no-print">Lectura Manual</th>
             <th style="text-align: center;">Cobro / Estado</th>
             <th class="no-print" style="text-align: center;">Recibo</th>
           </tr>
@@ -2200,6 +2343,10 @@
         document.getElementById('tariffInput').value = curMonth.priceKwh;
         document.getElementById('tableMonthTitle').innerText = `${curMonth.month} ${curMonth.year}`;
         document.getElementById('tableTariffSubtitle').innerText = `PRECIO kWh: $${curMonth.priceKwh}`;
+        const pTitle = document.getElementById('printHeaderTitle');
+        const pMeta = document.getElementById('printHeaderMeta');
+        if (pTitle) pTitle.innerText = `☀️ ${(appConfig.title || 'CUENTAS LUZ SAN MICHELL').toUpperCase()} — RESUMEN MENSUAL`;
+        if (pMeta) pMeta.innerText = `${curMonth.month} ${curMonth.year}   •   PRECIO kWh: $${curMonth.priceKwh}`;
       }
     }
 
@@ -2360,7 +2507,7 @@
             </div>
           </div>
 
-          <div class="manual-reading-bar">
+          <div class="manual-reading-bar no-print">
             <span>📝 Lectura Manual: <strong style="color:#0f172a;">${r.manualBy || 'Opcional'}</strong></span>
             <input type="number" inputmode="numeric" placeholder="Ej. 25721" value="${r.manual !== null && r.manual !== '' ? r.manual : ''}"
               onchange="updateRecordField(${r.local}, 'manual', this.value)">
@@ -2430,7 +2577,9 @@
         <td colspan="4">TOTAL LOCALES (1 AL 30)</td>
         <td style="text-align: right; font-family: 'Outfit', sans-serif; font-size: 15px;">${fmtNum(sumLocalesKwh)} kWh</td>
         <td style="text-align: right; font-family: 'Outfit', sans-serif; font-size: 15px; color: #b45309;">${fmtCLP(sumLocalesVal)}</td>
-        <td colspan="3"></td>
+        <td class="no-print"></td>
+        <td></td>
+        <td class="no-print"></td>
       `;
       tbody.appendChild(trTotalLocales);
 
@@ -2446,7 +2595,9 @@
         <td colspan="4">☀️ TOTAL FINAL (LOCALES + MALL CHINO)</td>
         <td style="text-align: right; font-family: 'Outfit', sans-serif; font-size: 16px; color: #fcd34d !important;">${fmtNum(sumLocalesKwh + mallKwh)} kWh</td>
         <td style="text-align: right; font-family: 'Outfit', sans-serif; font-size: 17px; color: #fcd34d !important;">${fmtCLP(sumLocalesVal + mallVal)}</td>
-        <td colspan="3"></td>
+        <td class="no-print"></td>
+        <td></td>
+        <td class="no-print"></td>
       `;
       tbody.appendChild(trTotalFinal);
     }
@@ -2477,7 +2628,7 @@
         <td style="text-align: right; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 14.5px; color: ${r.exempt ? '#94a3b8' : '#0f172a'};">
           ${hasCurr ? fmtCLP(value) : '—'}
         </td>
-        <td style="text-align: right;">
+        <td class="no-print" style="text-align: right;">
           <input type="number" inputmode="numeric" class="tbl-input" style="width: 80px; font-size: 12.5px;"
             placeholder="—" value="${r.manual !== null && r.manual !== '' ? r.manual : ''}"
             onchange="updateRecordField(${r.local}, 'manual', this.value)"
@@ -2488,7 +2639,7 @@
             <button class="chip-btn ${r.paid ? 'paid' : 'unpaid'}" onclick="toggleRecordPaid(${r.local})">
               ${r.paid ? 'Pagado' : 'Pendiente'}
             </button>
-            <button class="chip-btn ${r.exempt ? 'exempt' : ''}" onclick="toggleRecordExempt(${r.local})" title="Alternar cobro / exento">
+            <button class="chip-btn ${r.exempt ? 'exempt' : 'print-hide-dollar'}" onclick="toggleRecordExempt(${r.local})" title="Alternar cobro / exento">
               ${r.exempt ? 'Exento' : '$'}
             </button>
           </div>
@@ -3596,9 +3747,14 @@
     }
 
     function printTableReport() {
+      renderTableView();
       setViewMode('table');
       setTimeout(() => window.print(), 150);
     }
+
+    window.addEventListener('beforeprint', () => {
+      renderTableView();
+    });
 
     function resetToFactoryData() {
       if (confirm('¿Deseas restaurar los datos originales de Julio, Agosto, Septiembre y Octubre 2026?')) {
