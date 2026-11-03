@@ -2319,6 +2319,7 @@
     function renderAll() {
       renderMonthTabs();
       renderKPIs();
+      renderTableView();
       renderCurrentView();
     }
 
@@ -2434,13 +2435,12 @@
     }
 
     function renderCurrentView() {
+      renderTableView();
       if (currentViewMode === 'cards') {
         renderCardsView();
-      } else if (currentViewMode === 'table') {
-        renderTableView();
       } else if (currentViewMode === 'visuals') {
         renderVisualsView();
-      } else {
+      } else if (currentViewMode === 'history') {
         renderHistoryView();
       }
     }
