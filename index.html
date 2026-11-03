@@ -1044,10 +1044,10 @@
 
     @page {
       size: letter portrait;
-      margin: 5mm 8mm;
+      margin: 7mm 10mm;
     }
 
-    .print-only-header {
+    .print-minimal-sheet {
       display: none;
     }
 
@@ -1055,22 +1055,25 @@
       .login-screen,
       .app-header,
       .month-tariff-bar,
+      .kpi-grid,
       .controls-toolbar,
       .modal-overlay,
       .toast,
       .no-print,
       #viewCardsContainer,
+      #viewTableContainer,
       #viewVisualsContainer,
       #viewHistoryContainer {
         display: none !important;
       }
       html, body {
-        background: #fff !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
         padding: 0 !important;
         margin: 0 !important;
         height: auto !important;
         min-height: 0 !important;
-        font-size: 10px !important;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
@@ -1080,131 +1083,114 @@
         padding: 0 !important;
         margin: 0 !important;
       }
-      .print-only-header {
-        display: flex !important;
-        justify-content: space-between;
-        align-items: center;
-        background: #0f172a !important;
-        color: #ffffff !important;
-        padding: 5px 10px !important;
-        border-radius: 6px !important;
-        margin-bottom: 5px !important;
-        border-bottom: 2px solid #f59e0b !important;
-      }
-      .print-only-header .print-title {
-        font-family: 'Outfit', sans-serif;
-        font-size: 13px !important;
-        font-weight: 800;
-        color: #fcd34d !important;
-      }
-      .print-only-header .print-meta {
-        font-size: 10.5px !important;
-        font-weight: 700;
-        color: #ffffff !important;
-      }
-      .kpi-grid {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 6px !important;
-        margin-bottom: 5px !important;
-      }
-      .kpi-card {
-        padding: 4px 8px !important;
-        border-radius: 6px !important;
-        box-shadow: none !important;
-      }
-      .kpi-card .kpi-label {
-        font-size: 8px !important;
-        margin-bottom: 1px !important;
-      }
-      .kpi-card .kpi-val {
-        font-size: 13px !important;
-        line-height: 1.1 !important;
-      }
-      .kpi-card .kpi-sub {
-        font-size: 8px !important;
-        margin-top: 1px !important;
-      }
-      #viewTableContainer {
+      .print-minimal-sheet {
         display: block !important;
+        width: 100% !important;
+      }
+      .print-min-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 10.5px !important;
+        color: #0f172a !important;
+      }
+      .print-min-table thead th {
+        border-bottom: 1.5px solid #0f172a !important;
+        border-top: 1px solid #cbd5e1 !important;
+        padding: 4px 6px !important;
+        font-size: 9.5px !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.3px !important;
+        color: #0f172a !important;
+        background: #f8fafc !important;
+        text-align: left !important;
+      }
+      .print-min-table thead th.num {
+        text-align: right !important;
+      }
+      .print-min-table tbody td {
+        padding: 2.3px 6px !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        line-height: 1.2 !important;
+        font-size: 10.2px !important;
+        color: #1e293b !important;
+      }
+      .print-min-table tbody tr:nth-child(even) td {
+        background: #fcfcfd !important;
+      }
+      .print-min-table tbody td.num {
+        text-align: right !important;
+        font-variant-numeric: tabular-nums !important;
+      }
+      .print-min-table tbody tr.print-row-subtotal td {
+        border-top: 1.2px solid #64748b !important;
+        border-bottom: 1.2px solid #64748b !important;
+        font-weight: 700 !important;
+        background: #f8fafc !important;
+        padding: 3.5px 6px !important;
+        color: #0f172a !important;
+      }
+      .print-min-table tbody tr.print-row-total td {
+        border-top: 1.5px solid #0f172a !important;
+        border-bottom: 2px solid #0f172a !important;
+        font-weight: 800 !important;
+        font-size: 11px !important;
+        background: #f1f5f9 !important;
+        padding: 4px 6px !important;
+        color: #0f172a !important;
+      }
+      .print-summary-footer {
+        margin-top: 8px !important;
         border: 1px solid #cbd5e1 !important;
         border-radius: 6px !important;
-        box-shadow: none !important;
-        overflow: visible !important;
-        page-break-inside: avoid;
-        break-inside: avoid;
+        padding: 7px 12px !important;
+        background: #ffffff !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
-      #viewTableContainer > div:first-child {
-        display: none !important;
+      .print-summary-footer-head {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding-bottom: 4px !important;
+        margin-bottom: 6px !important;
       }
-      .solar-table {
-        width: 100% !important;
-        min-width: 0 !important;
-        border-collapse: collapse !important;
-      }
-      .solar-table th {
-        padding: 3.5px 6px !important;
-        font-size: 9px !important;
-        line-height: 1.1 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      .solar-table td {
-        padding: 1.8px 6px !important;
-        font-size: 10px !important;
-        line-height: 1.15 !important;
-        border-bottom: 1px solid #cbd5e1 !important;
-      }
-      .solar-table tr {
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
-      .solar-table tr.row-total-locales td {
-        padding: 3px 6px !important;
-        font-size: 10.5px !important;
-      }
-      .solar-table tr.row-total-final td {
-        padding: 4px 6px !important;
+      .print-summary-footer-title {
         font-size: 11px !important;
-      }
-      .solar-table th,
-      .solar-table tr.row-total-locales,
-      .solar-table tr.row-mall-chino,
-      .solar-table tr.row-total-final {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      .tbl-input,
-      .tbl-rubro-input {
-        border: none !important;
-        background: transparent !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        height: auto !important;
-        min-width: 0 !important;
-        width: 100% !important;
-        font-size: 10px !important;
-        line-height: 1.15 !important;
-        box-shadow: none !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.4px !important;
         color: #0f172a !important;
-        -webkit-appearance: none;
-        -moz-appearance: textfield;
-        appearance: none;
       }
-      .tbl-input::-webkit-outer-spin-button,
-      .tbl-input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
+      .print-summary-footer-meta {
+        font-size: 10px !important;
+        font-weight: 600 !important;
+        color: #475569 !important;
       }
-      .chip-btn {
-        padding: 1px 6px !important;
+      .print-summary-footer-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px !important;
+      }
+      .print-summary-item {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      .print-summary-item .lbl {
         font-size: 8.5px !important;
-        border-radius: 4px !important;
-        line-height: 1.1 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        color: #64748b !important;
       }
-      .chip-btn.print-hide-dollar {
-        display: none !important;
+      .print-summary-item .val {
+        font-size: 12px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+      }
+      .print-summary-item .sub {
+        font-size: 9px !important;
+        color: #475569 !important;
       }
     }
 
@@ -1397,10 +1383,45 @@
   <!-- ================= CONTENIDO PRINCIPAL ================= -->
   <main class="main-container">
 
-    <!-- ENCABEZADO COMPACTO EXCLUSIVO PARA IMPRESIÓN EN 1 HOJA CARTA -->
-    <div class="print-only-header">
-      <span class="print-title" id="printHeaderTitle">☀️ CUENTAS LUZ SAN MICHELL — RESUMEN MENSUAL</span>
-      <span class="print-meta" id="printHeaderMeta">SEPTIEMBRE 2026 • PRECIO kWh: $239</span>
+    <!-- HOJA MINIMALISTA EXCLUSIVA PARA IMPRESIÓN (1 PÁGINA TAMAÑO CARTA) -->
+    <div id="printMinimalSheet" class="print-minimal-sheet">
+      <table class="print-min-table">
+        <thead>
+          <tr>
+            <th style="width: 58px;">Local</th>
+            <th>Rubro</th>
+            <th class="num" style="width: 115px;">Lectura Anterior</th>
+            <th class="num" style="width: 115px;">Lectura Actual</th>
+            <th class="num" style="width: 105px;">Consumo</th>
+            <th class="num" style="width: 120px;">Valor a Cobrar</th>
+          </tr>
+        </thead>
+        <tbody id="printMinimalTableBody"></tbody>
+      </table>
+
+      <div class="print-summary-footer">
+        <div class="print-summary-footer-head">
+          <span class="print-summary-footer-title" id="printFooterTitle">Cuentas Luz San Michell — Resumen</span>
+          <span class="print-summary-footer-meta" id="printFooterMeta">SEPTIEMBRE 2026 • Precio kWh: $239</span>
+        </div>
+        <div class="print-summary-footer-grid">
+          <div class="print-summary-item">
+            <span class="lbl">Total Locales (1 al 30)</span>
+            <span class="val" id="printSumLocalesVal">$0</span>
+            <span class="sub" id="printSumLocalesKwh">0 kWh</span>
+          </div>
+          <div class="print-summary-item">
+            <span class="lbl">Local 31 • Mall Chino</span>
+            <span class="val" id="printSumMallVal">$0</span>
+            <span class="sub" id="printSumMallKwh">0 kWh</span>
+          </div>
+          <div class="print-summary-item">
+            <span class="lbl">Total Final del Mes</span>
+            <span class="val" id="printSumFinalVal">$0</span>
+            <span class="sub" id="printSumFinalKwh">0 kWh totales</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- SELECTOR DE MES Y PRECIO KWH -->
@@ -2600,6 +2621,96 @@
         <td class="no-print"></td>
       `;
       tbody.appendChild(trTotalFinal);
+
+      renderPrintMinimalSheet();
+    }
+
+    function renderPrintMinimalSheet() {
+      const curMonth = getCurrentMonthObj();
+      const pBody = document.getElementById('printMinimalTableBody');
+      if (!curMonth || !pBody) return;
+      pBody.innerHTML = '';
+
+      let sumLocalesKwh = 0;
+      let sumLocalesVal = 0;
+      let mallKwh = 0;
+      let mallVal = 0;
+
+      const regularRecords = curMonth.records.filter(r => r.local !== 31);
+      const mallRecord = curMonth.records.find(r => r.local === 31);
+
+      regularRecords.forEach(r => {
+        const { hasCurr, kwh, value } = calcRecord(r, curMonth.priceKwh);
+        sumLocalesKwh += kwh;
+        sumLocalesVal += value;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 700;">${r.local}</td>
+          <td>${r.rubro || '-'}</td>
+          <td class="num">${fmtNum(r.prev)}</td>
+          <td class="num">${hasCurr ? fmtNum(r.curr) : '—'}</td>
+          <td class="num">${hasCurr ? fmtNum(kwh) + ' kWh' : '—'}</td>
+          <td class="num" style="font-weight: 700;">${hasCurr ? fmtCLP(value) : '—'}</td>
+        `;
+        pBody.appendChild(tr);
+      });
+
+      const trSub = document.createElement('tr');
+      trSub.className = 'print-row-subtotal';
+      trSub.innerHTML = `
+        <td colspan="4">TOTAL LOCALES (1 AL 30)</td>
+        <td class="num">${fmtNum(sumLocalesKwh)} kWh</td>
+        <td class="num">${fmtCLP(sumLocalesVal)}</td>
+      `;
+      pBody.appendChild(trSub);
+
+      if (mallRecord) {
+        const { hasCurr, kwh, value } = calcRecord(mallRecord, curMonth.priceKwh);
+        mallKwh = kwh;
+        mallVal = value;
+        const trMall = document.createElement('tr');
+        trMall.innerHTML = `
+          <td style="font-weight: 700;">31</td>
+          <td style="font-weight: 600;">${mallRecord.rubro || 'MALL CHINO'}</td>
+          <td class="num">${fmtNum(mallRecord.prev)}</td>
+          <td class="num">${hasCurr ? fmtNum(mallRecord.curr) : '—'}</td>
+          <td class="num">${hasCurr ? fmtNum(kwh) + ' kWh' : '—'}</td>
+          <td class="num" style="font-weight: 700;">${hasCurr ? fmtCLP(value) : '—'}</td>
+        `;
+        pBody.appendChild(trMall);
+      }
+
+      const totalKwh = sumLocalesKwh + mallKwh;
+      const totalVal = sumLocalesVal + mallVal;
+
+      const trFinal = document.createElement('tr');
+      trFinal.className = 'print-row-total';
+      trFinal.innerHTML = `
+        <td colspan="4">TOTAL FINAL (LOCALES + MALL CHINO)</td>
+        <td class="num">${fmtNum(totalKwh)} kWh</td>
+        <td class="num">${fmtCLP(totalVal)}</td>
+      `;
+      pBody.appendChild(trFinal);
+
+      const fTitle = document.getElementById('printFooterTitle');
+      const fMeta = document.getElementById('printFooterMeta');
+      if (fTitle) fTitle.innerText = `${appConfig.title || 'Cuentas Luz San Michell'} — Resumen`;
+      if (fMeta) fMeta.innerText = `${curMonth.month} ${curMonth.year}   •   Precio kWh: $${curMonth.priceKwh}`;
+
+      const elLocVal = document.getElementById('printSumLocalesVal');
+      const elLocKwh = document.getElementById('printSumLocalesKwh');
+      const elMallVal = document.getElementById('printSumMallVal');
+      const elMallKwh = document.getElementById('printSumMallKwh');
+      const elFinVal = document.getElementById('printSumFinalVal');
+      const elFinKwh = document.getElementById('printSumFinalKwh');
+
+      if (elLocVal) elLocVal.innerText = fmtCLP(sumLocalesVal);
+      if (elLocKwh) elLocKwh.innerText = `${fmtNum(sumLocalesKwh)} kWh consumidos`;
+      if (elMallVal) elMallVal.innerText = fmtCLP(mallVal);
+      if (elMallKwh) elMallKwh.innerText = `${fmtNum(mallKwh)} kWh consumidos`;
+      if (elFinVal) elFinVal.innerText = fmtCLP(totalVal);
+      if (elFinKwh) elFinKwh.innerText = `${fmtNum(totalKwh)} kWh totales`;
     }
 
     function createTableRow(r, priceKwh, isMall) {
@@ -3747,13 +3858,12 @@
     }
 
     function printTableReport() {
-      renderTableView();
-      setViewMode('table');
-      setTimeout(() => window.print(), 150);
+      renderPrintMinimalSheet();
+      window.print();
     }
 
     window.addEventListener('beforeprint', () => {
-      renderTableView();
+      renderPrintMinimalSheet();
     });
 
     function resetToFactoryData() {
